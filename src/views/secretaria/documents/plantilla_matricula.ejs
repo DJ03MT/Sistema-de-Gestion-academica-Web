@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Hoja de Matrícula</title>
+    <style>
+        /* --- Estilos Generales de la Hoja --- */
+        @page {
+            size: Letter;
+            margin: 0.75in;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 9.5pt;
+            color: #000;
+        }
+
+        /* --- Contenedor de una hoja --- */
+        .hoja {
+            width: 100%;
+            height: 100%;
+            page-break-after: always; /* Salto de página después de cada hoja */
+        }
+
+        .hoja:last-child {
+            page-break-after: avoid; /* Evita un salto en la última hoja */
+        }
+
+        /* --- Encabezado --- */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 2px solid #000;
+            padding-bottom: 10px;
+        }
+        .header-logo {
+            width: 90px;
+        }
+        .header-logo img {
+            width: 100%;
+        }
+        .header-titulo {
+            text-align: center;
+            flex-grow: 1;
+        }
+        .header-titulo h1 {
+            font-size: 14pt;
+            margin: 0;
+            font-weight: bold;
+        }
+        .header-titulo p {
+            font-size: 12pt;
+            margin: 5px 0 0 0;
+            font-weight: bold;
+        }
+        .header-info-lateral {
+            width: 90px;
+            text-align: right;
+        }
+        .header-compromiso {
+            font-size: 8pt;
+            text-align: justify;
+            margin-top: 5px;
+        }
+
+        /* --- Info Grado y Fecha --- */
+        .info-grado {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+        }
+
+        /* --- Secciones y Títulos --- */
+        .seccion-titulo {
+            font-size: 10pt;
+            font-weight: bold;
+            margin-top: 15px;
+            margin-bottom: 8px;
+        }
+
+        /* --- Tablas para alinear campos --- */
+        table.datos {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table.datos td {
+            border: 1px solid #000;
+            padding: 4px 6px;
+            vertical-align: top;
+        }
+        table.datos .etiqueta {
+            font-weight: normal;
+            font-size: 8.5pt;
+            text-align: center;
+        }
+        table.datos .valor {
+            font-weight: bold;
+            height: 18px; /* Altura fija para el campo */
+        }
+        
+        /* Checkboxes */
+        .chk {
+            display: inline-block;
+            margin-right: 15px;
+        }
+        .chk-box {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border: 1px solid #000;
+            margin-right: 5px;
+            text-align: center;
+            line-height: 10px;
+            font-weight: bold;
+        }
+        
+        /* --- Compromiso y Firmas --- */
+        .compromiso-box {
+            border: 1px solid #000;
+            padding: 10px;
+            margin-top: 10px;
+        }
+        .compromiso-titulo {
+            font-size: 9pt;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .compromiso-texto {
+            font-size: 8.5pt;
+            text-align: justify;
+            line-height: 1.2;
+        }
+        .compromiso-texto ul {
+            padding-left: 15px;
+            margin: 5px 0;
+        }
+
+        .firmas {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+        }
+        .firma-linea {
+            border-top: 1px solid #000;
+            width: 200px;
+            text-align: center;
+            padding-top: 5px;
+            font-size: 9pt;
+        }
+    </style>
+</head>
+<body>
+    
+    <% estudiantes.forEach(datos => { %>
+    
+        <div class="hoja">
+
+            <div class="header">
+                <div class="header-logo">
+                    <img src="http://localhost:3000/img/LogoWE.webp" alt="Logo">
+                </div>
+                <div class="header-titulo">
+                    <h1>CENTRO ESCOLAR ENRIQUE DE OSSÓ</h1>
+                    <p>HOJA DE MATRÍCULA <%= datos.Anio || new Date().getFullYear() %></p>
+                </div>
+                <div class="header-info-lateral">
+                    </div>
+            </div>
+            <p class="header-compromiso">
+                El Centro Enrique de Ossó es una Escuela Católica que forma parte de la Red de Escuelas Teresianas de la
+                Compañía de Santa Teresa de Jesús y educa bajo los principios de la Propuesta Educativa Teresiana.
+            </p>
+
+            <div class="info-grado">
+                <span><strong>Grado al que matricula:</strong> <%= datos.NombreGrado %></span>
+                <span><strong>Fecha de entrega:</strong> <%= new Date().toLocaleDateString('es-NI') %></span>
+            </div>
+
+            <div class="seccion-titulo">A- DATOS PERSONAL DEL ESTUDIANTE</div>
+            <table class="datos">
+                <tr>
+                    <td colspan="2" class="valor"><%= datos.PRIMER_NOMBRE %></td>
+                    <td colspan="2" class="valor"><%= datos.SEGUNDO_NOMBRE %></td>
+                    <td colspan="2" class="valor"><%= datos.PRIMER_APELLIDO %></td>
+                    <td colspan="2" class="valor"><%= datos.SEGUNDO_APELLIDO %></td>
+                </tr>
+                <tr>
+                    <td colspan="2" class="etiqueta">Primer Nombre</td>
+                    <td colspan="2" class="etiqueta">Segundo Nombre</td>
+                    <td colspan="2" class="etiqueta">Primer Apellido</td>
+                    <td colspan="2" class="etiqueta">Segundo Apellido</td>
+                </tr>
+                <tr>
+                    <td colspan="4" class="valor"><%= datos.LugarNacimiento %> / <%= datos.FECHA_NACIMIENTO ? new Date(datos.FECHA_NACIMIENTO).toLocaleDateString('es-NI') : '' %></td>
+                    <td colspan="4" class="valor"><%= datos.RELIGION %></td>
+                </tr>
+                <tr>
+                    <td colspan="4" class="etiqueta">Lugar y fecha de nacimiento</td>
+                    <td colspan="4" class="etiqueta">Religión</td>
+                </tr>
+                <tr>
+                    <td colspan="4">
+                        <strong>Sexo:</strong>&nbsp;&nbsp;
+                        <span class="chk"><span class="chk-box"><%= (datos.SEXO === 'M') ? 'X' : '' %></span> Masculino</span>
+                        <span class="chk"><span class="chk-box"><%= (datos.SEXO === 'F') ? 'X' : '' %></span> Femenino</span>
+                    </td>
+                    <td colspan="4">
+                        <strong>Con quién vive:</strong>&nbsp;&nbsp;
+                        <span class="chk"><span class="chk-box"><%= (datos.ConQuienVive === 'PADRE Y MADRE') ? 'X' : '' %></span> Padre y Madre</span>
+                        <span class="chk"><span class="chk-box"><%= (datos.ConQuienVive === 'PADRE') ? 'X' : '' %></span> Padre</span>
+                        <span class="chk"><span class="chk-box"><%= (datos.ConQuienVive === 'MADRE') ? 'X' : '' %></span> Madre</span>
+                        <span class="chk"><span class="chk-box"><%= (datos.ConQuienVive === 'TUTOR') ? 'X' : '' %></span> Tutor</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="8" class="valor"><%= datos.DOMICILIO %></td>
+                </tr>
+                <tr>
+                    <td colspan="8" class="etiqueta">Dirección domiciliar</td>
+                </tr>
+                <tr>
+                    <td colspan="8" class="valor"><%= datos.DIAGNOSTICO_SALUD %></td>
+                </tr>
+                <tr>
+                    <td colspan="8" class="etiqueta">Padecimiento diagnóstico</td>
+                </tr>
+            </table>
+
+            <div class="seccion-titulo">B- DATOS FAMILIARES</div>
+            <table class="datos">
+                <tr>
+                    <td colspan="4" class="valor"><%= datos.NombrePadre %></td>
+                    <td colspan="4" class="valor"><%= datos.NombreMadre %></td>
+                </tr>
+                <tr>
+                    <td colspan="4" class="etiqueta">Nombre Padre</td>
+                    <td colspan="4" class="etiqueta">Nombre Madre</td>
+                </tr>
+                <tr>
+                    <td colspan="2" class="valor"><%= datos.CedulaPadre %></td>
+                    <td colspan="2" class="valor"><%= datos.NivelAcademicoPadre %></td>
+                    <td colspan="2" class="valor"><%= datos.CedulaMadre %></td>
+                    <td colspan="2" class="valor"><%= datos.NivelAcademicoMadre %></td>
+                </tr>
+                <tr>
+                    <td colspan="2" class="etiqueta">Cédula Padre</td>
+                    <td colspan="2" class="etiqueta">Nivel académico</td>
+                    <td colspan="2" class="etiqueta">Cédula Madre</td>
+                    <td colspan="2" class="etiqueta">Nivel académico</td>
+                </tr>
+                <tr>
+                    <td colspan="4" class="valor"><%= datos.ProfesionPadre %></td>
+                    <td colspan="4" class="valor"><%= datos.ProfesionMadre %></td>
+                </tr>
+                <tr>
+                    <td colspan="4" class="etiqueta">Profesión Padre</td>
+                    <td colspan="4" class="etiqueta">Profesión Madre</td>
+                </tr>
+                <tr>
+                    <td colspan="4" class="valor"><%= datos.LugarTrabajoPadre %></td>
+                    <td colspan="4" class="valor"><%= datos.LugarTrabajoMadre %></td>
+                </tr>
+                <tr>
+                    <td colspan="4" class="etiqueta">Lugar de trabajo</td>
+                    <td colspan="4" class="etiqueta">Lugar de trabajo</td>
+                </tr>
+                <tr>
+                    <td colspan="2" class="valor"><%= datos.TelefonoPersonalPadre %></td>
+                    <td colspan="2" class="valor"><%= datos.TelefonoTrabajoPadre %></td>
+                    <td colspan="2" class="valor"><%= datos.TelefonoPersonalMadre %></td>
+                    <td colspan="2" class="valor"><%= datos.TelefonoTrabajoMadre %></td>
+                </tr>
+                <tr>
+                    <td colspan="2" class="etiqueta">Teléfono personal</td>
+                    <td colspan="2" class="etiqueta">Teléfono de trabajo</td>
+                    <td colspan="2" class="etiqueta">Teléfono personal</td>
+                    <td colspan="2" class="etiqueta">Teléfono de trabajo</td>
+                </tr>
+                <tr>
+                    <td colspan="4" class="valor"><%= datos.EmailPadre %></td>
+                    <td colspan="4" class="valor"><%= datos.EmailMadre %></td>
+                </tr>
+                <tr>
+                    <td colspan="4" class="etiqueta">Correo electrónico</td>
+                    <td colspan="4" class="etiqueta">Correo electrónico</td>
+                </tr>
+                <tr>
+                    <td colspan="8">
+                        <strong>Estado civil de los padres:</strong>&nbsp;&nbsp;
+                        <span class="chk"><span class="chk-box"><%= (datos.EstadoCivilPadres === 'CASADOS') ? 'X' : '' %></span> casados</span>
+                        <span class="chk"><span class="chk-box"><%= (datos.EstadoCivilPadres === 'DIVORCIADOS') ? 'X' : '' %></span> Divorciados</span>
+                        <span class="chk"><span class="chk-box"><%= (datos.EstadoCivilPadres === 'SOLTERO') ? 'X' : '' %></span> Soltero</span>
+                        <span class="chk"><span class="chk-box"><%= (datos.EstadoCivilPadres === 'UNION LIBRE') ? 'X' : '' %></span> En unión libre</span>
+                    </td>
+                </tr>
+            </table>
+
+            <table class="datos" style="margin-top: 5px;">
+                <tr>
+                    <td rowspan="2" style="width: 20%; vertical-align: middle; text-align: center;"><strong>En caso de emergencia<br>llamar a:</strong></td>
+                    <td class="valor"><%= datos.EmergenciaNombre1 %></td>
+                    <td class="valor" style="width: 25%;"><%= datos.EmergenciaTelefono1 %></td>
+                </tr>
+                <tr>
+                    <td class="etiqueta">Nombre (escribir mínimo dos personas)</td>
+                    <td class="etiqueta"># teléfono</td>
+                </tr>
+                 <tr>
+                    <td rowspan="2" style="width: 20%; vertical-align: middle; text-align: center;"><strong>Hermanos activos<br>en el colegio:</strong></td>
+                    <td class="valor"><%= datos.EmergenciaNombre2 %></td> <td class="valor" style="width: 25%;"><%= datos.EmergenciaTelefono2 %></td>
+                </tr>
+                <tr>
+                    <td class="etiqueta">Nombre completo</td>
+                    <td class="etiqueta">Grado</td>
+                </tr>
+            </table>
+            
+            <div class="compromiso-box">
+                <div class="compromiso-titulo">COMPROMISO QUE ADQUIERE AL MATRICULAR A SU HIJO/A EN EL CENTRO ESCOLAR ENRIQUE DE OSSÓ</div>
+                <div class="compromiso-texto">
+                    Por ser una escuela católica se imparte la asignatura de Fe y vida, se celebran las fiestas del calendario litúrgico católico, especialmente
+                    a Teresa de Jesús y Enrique de Ossó, los estudiantes participan del Cuarto de Hora de Oración, Eucaristías, Purísima... Acogemos en el
+                    Centro a estudiantes de otras confesiones religiosas y favorecemos el diálogo entre las diversas confesiones.
+                    <br><strong>Al matricular a su hijo-a en este Centro de estudios usted se compromete obligatoriamente a:</strong>
+                    <ul>
+                        <li>Conocer la Propuesta Educativa Teresiana.</li>
+                        <li>Permitir que su hijo-a participe en actos y celebraciones que se promuevan como parte de su formación integral.</li>
+                        <li>Asistir a todas las entrevistas y reuniones que se convoquen desde las distintas instancias del Centro.</li>
+                        <li>Participar en las diversas actividades que se proponen para los padres y madres de familia: delegado de sección, Consejo de Padres, formaciones, actividades académicas, aseo de aula (de preescolar a segundo grado), elaboración de la merienda escolar (preescolar y primaria), actividades para el sostenimiento de los servicios básicos del centro, especialmente la Kermese.</li>
+                        <li>Llevar al día el pago de mensualidades, (de lo contrario se condicionará su matrícula para el año lectivo X) y comunicar su retiro con una semana de anticipación.</li>
+                        <li><strong>Al firmar esta hoja de matrícula usted autoriza la toma de fotografías en las que aparezca su hijo-a y que serán usadas por la institución en sus páginas oficiales.</strong></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="firmas">
+                <div class="firma-linea">Firma coordinadora</div>
+                <div class="firma-linea">Firma directora general</div>
+                <div class="firma-linea">Firma tutor o responsable</div>
+            </div>
+
+        </div> <% }); %>
+</body>
+</html>

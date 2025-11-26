@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <title>Gestión de Año Lectivo</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/styles/forms.css">
+    <link rel="stylesheet" href="/styles/menusecretaria.css">
+</head>
+<body style="background: var(--light);">
+    <div class="form-page-container" style="max-width: 800px;">
+        <div class="form-header">
+            <h1><i class="fas fa-calendar-alt"></i> Gestión de Año Lectivo</h1>
+            <p>Configure periodos y active el año escolar actual.</p>
+        </div>
+        <div class="form-content">
+            <div class="form-section">
+                <h2 class="section-title">Crear Nuevo Año</h2>
+                <form method="POST" action="/admin/anios" class="form-grid" style="grid-template-columns: 1fr 1fr 1fr auto;">
+                    <div class="form-group"><label>Año</label><input type="number" name="Anio" placeholder="Ej: 2026" required></div>
+                    <div class="form-group"><label>Fecha de Inicio</label><input type="date" name="FechaInicio" required></div>
+                    <div class="form-group"><label>Fecha de Fin</label><input type="date" name="FechaFin" required></div>
+                    <div class="form-group"><label>&nbsp;</label><button type="submit" class="btn btn-primary">Crear</button></div>
+                </form>
+            </div>
+
+            <div class="form-section">
+                <h2 class="section-title">Años Registrados</h2>
+                
+                <div class="search-bar" style="margin-bottom: 20px;">
+                    <input type="text" class="search-input" id="searchAnios" placeholder="Filtrar por año...">
+                    <button class="search-btn"><i class="fas fa-search"></i></button>
+                </div>
+
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead><tr><th>Año</th><th>Periodo</th><th>Estado</th><th>Acción</th></tr></thead>
+                        <tbody id="tbodyAnios">
+                            <% anios.forEach(a => { %>
+                                <tr>
+                                    <td><%= a.Anio %></td>
+                                    <td><%= new Date(a.FechaInicio).toLocaleDateString('es-ES') %> - <%= new Date(a.FechaFin).toLocaleDateString('es-ES') %></td>
+                                    <td><span class="status-badge <%= a.EstaActivo ? 'status-active' : 'status-inactive' %>"><%= a.EstaActivo ? 'ACTIVO' : 'Inactivo' %></span></td>
+                                    <td>
+                                        <% if (!a.EstaActivo) { %>
+                                            <form method="POST" action="/admin/anios/<%= a.ID_Anio_Lectivo %>/activar">
+                                                <button type="submit" class="btn-action btn-edit">Activar</button>
+                                            </form>
+                                        <% } else { %>
+                                            <span style="color: var(--success); font-weight: 600;">(En curso)</span>
+                                        <% } %>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+             <div class="btn-group">
+                <a href="/admin" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Volver al Admin</a>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('searchAnios');
+            const tableBody = document.getElementById('tbodyAnios');
+            const rows = tableBody.querySelectorAll('tr');
+
+            searchInput.addEventListener('keyup', function() {
+                const query = searchInput.value.toLowerCase();
+
+                rows.forEach(row => {
+                    const anio = row.querySelectorAll('td')[0]?.textContent.toLowerCase() || '';
+                    
+                    if (anio.includes(query)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

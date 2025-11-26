@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historial Académico</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/styles/form.css">
+    <link rel="stylesheet" href="/styles/menusecretaria.css"> 
+</head>
+<body style="background: var(--light);">
+
+    <div class="form-page-container" style="max-width: 1200px;">
+        <div class="form-header">
+            <h1><i class="fas fa-history"></i> Historial Académico</h1>
+            <p>
+                <strong>Estudiante:</strong> <%= estudiante.PRIMER_APELLIDO %>, <%= estudiante.PRIMER_NOMBRE %><br>
+                <strong>Código:</strong> <%= estudiante.CODIGO_ESTUDIANTE %>
+            </p>
+        </div>
+
+        <div class="form-content">
+
+            <% if (historialPorAnio.length === 0) { %>
+                <div class="alert alert-danger" style="text-align: center;">
+                    Este estudiante no tiene ningún historial de notas registrado.
+                </div>
+            <% } %>
+
+            <% historialPorAnio.forEach(anio => { %>
+                <div class="form-section">
+                    <h2 class="section-title">
+                        Boletín del Año <%= anio.Anio %> - (Cursó <%= anio.NombreGrado %>)
+                    </h2>
+                    
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr style="background: var(--primary-dark);">
+                                    <th>Asignatura</th>
+                                    <th>Corte 1</th>
+                                    <th>Valores C1</th>
+                                    <th>Corte 2</th>
+                                    <th>Valores C2</th>
+                                    <th>Corte 3</th>
+                                    <th>Valores C3</th>
+                                    <th>Corte 4</th>
+                                    <th>Valores C4</th>
+                                    <th>Conducta</th>
+                                    <th>Prom. Final</th>
+                                    <th>Cualitativo</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% anio.boletin.forEach(item => { %>
+                                    <tr>
+                                        <td><strong><%= item.NombreAsignatura %></strong></td>
+                                        <td><%= item.Nota_Corte1 || '-' %></td>
+                                        <td><%= item.Nota_Valores_C1 || '-' %></td>
+                                        <td><%= item.Nota_Corte2 || '-' %></td>
+                                        <td><%= item.Nota_Valores_C2 || '-' %></td>
+                                        <td><%= item.Nota_Corte3 || '-' %></td>
+                                        <td><%= item.Nota_Valores_C3 || '-' %></td>
+                                        <td><%= item.Nota_Corte4 || '-' %></td>
+                                        <td><%= item.Nota_Valores_C4 || '-' %></td>
+                                        <td><%= item.Nota_Conducta || '-' %></td>
+                                        <td><strong><%= Math.round(item.Promedio_Final_Cuantitativo || 0) %></strong></td>
+                                        <td><%= item.Promedio_Final_Cualitativo || '-' %></td>
+                                    </tr>
+                                <% }); %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            <% }); %>
+
+            <div class="btn-group">
+                <a href="/secretaria" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Volver a Secretaría
+                </a>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

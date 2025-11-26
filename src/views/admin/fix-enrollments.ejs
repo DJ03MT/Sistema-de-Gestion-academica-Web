@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <title>Reparar Inscripciones</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/styles/forms.css">
+    <link rel="stylesheet" href="/styles/menusecretaria.css">
+</head>
+<body style="background: var(--light);">
+    <div class="form-page-container" style="max-width: 1000px;">
+        <div class="form-header">
+            <h1><i class="fas fa-hammer"></i> Reparar Inscripciones Faltantes</h1>
+            <p>Estudiantes 'Activos' que no tienen inscripciones en el año escolar actual (<%= zombies.length %> encontrados).</p>
+        </div>
+        
+        <div class="form-content">
+            <% if (success) { %>
+                <div class="alert alert-success"><i class="fas fa-check-circle"></i> <%= success %></div>
+            <% } %>
+            <% if (error) { %>
+                <div class="alert alert-danger"><i class="fas fa-exclamation-triangle"></i> <%= error %></div>
+            <% } %>
+
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Estudiante</th>
+                            <th>Grado (Ficha)</th>
+                            <th style="width: 200px;">Asignar a Sección</th>
+                            <th style="width: 120px;">Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% zombies.forEach(z => { %>
+                            <form method="POST" action="/admin/fix-enrollment/<%= z.id_estudiante %>">
+                                <input type="hidden" name="ID_Grado" value="<%= z.ID_Grado_Matriculado %>">
+                                <input type="hidden" name="ID_Anio_Lectivo" value="<%= anioActivoID %>">
+                                
+                                <tr>
+                                    <td><%= z.PRIMER_APELLIDO %>, <%= z.PRIMER_NOMBRE %> (ID: <%= z.id_estudiante %>)</td>
+                                    <td><%= z.NombreGrado %></td>
+                                    <td>
+                                        <select name="ID_Seccion" class="form-group" style="padding: 5px;" required>
+                                            <option value="">-- Seleccionar Sección --</option>
+                                            <% secciones.forEach(s => { %>
+                                                <option value="<%= s.ID_Seccion %>"><%= s.NombreSeccion %></option>
+                                            <% }); %>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <button type="submit" class="btn btn-primary" style="padding: 5px 10px; background: var(--success);">
+                                            <i class="fas fa-save"></i> Inscribir
+                                        </button>
+                                    </td>
+                                </tr>
+                            </form>
+                        <% }); %>
+                        <% if (zombies.length === 0) { %>
+                            <tr>
+                                <td colspan="4" style="text-align: center;">¡Felicidades! No se encontraron estudiantes "zombis".</td>
+                            </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+            <div class="btn-group">
+                <a href="/admin" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Volver al Admin</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

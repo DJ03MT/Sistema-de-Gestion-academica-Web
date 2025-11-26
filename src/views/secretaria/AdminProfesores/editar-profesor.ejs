@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Editar Profesor</title>
+  <link rel="stylesheet" href="/styles/form.css">
+  <style>
+    .form-container {
+      background: white;
+      padding: 30px;
+      border-radius: 16px;
+      max-width: 800px;
+      margin: 40px auto;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .form-group label {
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+      font-family: 'Segoe UI';
+    }
+
+    .form-group textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .form-group.full-width {
+      grid-column: 1 / -1;
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    .form-group small {
+      font-size: 0.85rem;
+      color: #6c757d;
+      margin-top: 5px;
+    }
+  </style>
+</head>
+
+<body style="background: #f8f9fa;">
+  <div class="form-container">
+    <h1><i class="fas fa-user-edit"></i> Editar Profesor</h1>
+
+    <form action="/secretaria/editar-profesor/<%= profesor.ID_PROFESOR %>" method="POST">
+      <div class="form-grid">
+        <div class="form-group"><label>Primer Nombre:</label><input type="text" name="PRIMER_NOMBRE" value="<%= profesor.PRIMER_NOMBRE %>" required></div>
+        <div class="form-group"><label>Segundo Nombre:</label><input type="text" name="SEGUNDO_NOMBRE" value="<%= profesor.SEGUNDO_NOMBRE || '' %>"></div>
+        <div class="form-group"><label>Primer Apellido:</label><input type="text" name="PRIMER_APELLIDO" value="<%= profesor.PRIMER_APELLIDO %>" required></div>
+        <div class="form-group"><label>Segundo Apellido:</label><input type="text" name="SEGUNDO_APELLIDO" value="<%= profesor.SEGUNDO_APELLIDO || '' %>"></div>
+        <div class="form-group"><label>Cédula Identidad:</label><input type="text" name="CEDULA_IDENTIDAD" value="<%= profesor.CEDULA_IDENTIDAD ||
+ '' %>"></div>
+        <div class="form-group"><label>Cargo Real:</label><input type="text" name="CARGO_REAL" value="<%= profesor.CARGO_REAL ||
+ '' %>"></div>
+        <div class="form-group"><label>Especialidad:</label><input type="text" name="ESPECIALIDAD_DOCENTE" value="<%= profesor.ESPECIALIDAD_DOCENTE ||
+ '' %>"></div>
+        <div class="form-group"><label>Carga Horaria:</label><input type="text" name="CARGA_HORARIA" value="<%= profesor.CARGA_HORARIA ||
+ '' %>"></div>
+        <div class="form-group"><label>Títulos:</label><input type="text" name="TITULOS" value="<%= profesor.TITULOS ||
+ '' %>"></div>
+        <div class="form-group"><label>Turno:</label><input type="text" name="TURNO" value="<%= profesor.TURNO ||
+ '' %>"></div>
+        <div class="form-group full-width">
+          <label>Observaciones:</label>
+          <textarea name="OBSERVACIONES"><%= profesor.OBSERVACIONES || '' %></textarea>
+        </div>
+
+        <div class="form-group full-width">
+
+          <label>Cuenta de Usuario (Login):</label>
+          <select name="ID_Usuario">
+            <option value="">-- Sin cuenta de login --</option>
+            <% usuarios.forEach(u => { 
+ %>
+            <option value="<%= u.ID_Usuario %>" <%= (profesor.ID_Usuario == u.ID_Usuario) ? 
+ 'selected' : '' %>>
+              <%= u.Email %>
+            </option>
+
+            <% }); %>
+          </select>
+          <small>Selecciona el email de Google con el que este profesor iniciará sesión. Solo aparecen usuarios activos con rol 'Profesor' o 'Pendiente'. Si no aparece, el Director debe asignarle el rol primero.</small>
+        </div>
+
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Actualizar Cambios</button>
+        <a href="/secretaria" class="btn" style="background: #ccc;
+ text-decoration: none; color: black;">Cancelar</a>
+      </div>
+    </form>
+  </div>
+</body>
+
+</html>

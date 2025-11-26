@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Subir Notas - <%= curso.NombreAsignatura %>
+    </title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/styles/menuprofesores.css">
+    <style>
+        /* Estilos específicos para la vista de notas */
+        .toolbar {
+            background: white;
+            padding: 15px 25px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .corte-selector {
+            display: flex;
+            gap: 10px;
+        }
+
+        .corte-btn {
+            padding: 8px 20px;
+            border: 2px solid #e9ecef;
+            background: transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--gray);
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+
+        .corte-btn.active {
+            border-color: var(--primary);
+            background: rgba(3, 130, 172, 0.1);
+            color: var(--primary);
+        }
+
+        /* Estilo de Lista de Estudiantes (No tabla) */
+        .student-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .student-row {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+            transition: transform 0.2s;
+        }
+
+        .student-row:hover {
+            transform: translateX(5px);
+            border-left: 4px solid var(--primary);
+        }
+
+        .student-info {
+            flex: 1;
+        }
+
+        .student-name {
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--dark);
+        }
+
+        .student-code {
+            font-size: 0.8rem;
+            color: var(--gray);
+        }
+
+        .inputs-container {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            width: 100px;
+        }
+
+        .input-group label {
+            font-size: 0.7rem;
+            color: var(--gray);
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        .grade-input {
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            width: 100%;
+            font-weight: 600;
+            text-align: center;
+            font-size: 1rem;
+        }
+
+        .grade-input:focus {
+            border-color: var(--primary);
+            outline: none;
+            background: #f0f9ff;
+        }
+
+        .save-fab {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--success);
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 5px 20px rgba(42, 157, 143, 0.4);
+            border: none;
+            cursor: pointer;
+            transition: transform 0.3s;
+            z-index: 100;
+        }
+
+        .save-fab:hover {
+            transform: scale(1.1);
+        }
+
+        .save-label {
+            position: fixed;
+            bottom: 38px;
+            right: 100px;
+            background: #333;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+
+        .save-fab:hover+.save-label {
+            opacity: 1;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <div class="sidebar">
+            <div class="user-profile">
+                <div class="avatar"><img src="<%= user.photo %>" alt="User" class="user-photo"></div>
+                <div class="user-name">Profesor</div>
+            </div>
+            <ul class="nav-links">
+                <li><a href="/profesores" class="nav-link"><i class="fas fa-arrow-left"></i> Volver</a></li>
+            </ul>
+        </div>
+
+        <div class="main-content">
+            <div class="content-header">
+                <div>
+                    <h1>
+                        <%= curso.NombreAsignatura %>
+                    </h1>
+                    <p>
+                        <%= curso.NombreGrado %> - Sección "<%= curso.NombreSeccion %>"
+                    </p>
+                </div>
+            </div>
+
+            <div class="toolbar">
+                <span style="font-weight: 600; color: var(--dark);">Seleccionar Corte:</span>
+                <div class="corte-selector">
+                    <a href="?corte=1" class="corte-btn <%= corte === '1' ? 'active' : '' %>">I Corte</a>
+                    <a href="?corte=2" class="corte-btn <%= corte === '2' ? 'active' : '' %>">II Corte</a>
+                    <a href="?corte=3" class="corte-btn <%= corte === '3' ? 'active' : '' %>">III Corte</a>
+                    <a href="?corte=4" class="corte-btn <%= corte === '4' ? 'active' : '' %>">IV Corte</a>
+                </div>
+            </div>
+
+            <div class="student-list" id="listaEstudiantes">
+                <% estudiantes.forEach(est=> { %>
+                    <div class="student-row" data-id="<%= est.ID_Inscripcion %>">
+                        <div class="student-info">
+                            <div class="student-name">
+                                <%= est.PRIMER_APELLIDO %>
+                                    <%= est.SEGUNDO_APELLIDO %>, <%= est.PRIMER_NOMBRE %>
+                                            <%= est.SEGUNDO_NOMBRE %>
+                            </div>
+                            <div class="student-code"><i class="fas fa-id-card"></i>
+                                <%= est.CODIGO_ESTUDIANTE %>
+                            </div>
+                        </div>
+
+                        <div class="inputs-container">
+                            <div class="input-group">
+                                <label>Nota Acad.</label>
+                                <input type="number" class="grade-input input-academico" min="0" max="100"
+                                    placeholder="-" value="<%= est['Nota_Corte' + corte] %>">
+                            </div>
+                            <div class="input-group">
+                                <label>Valores</label>
+                                <input type="number" class="grade-input input-valores" min="0" max="100" placeholder="-"
+                                    value="<%= est['Nota_Valores_C' + corte] %>">
+                            </div>
+                        </div>
+                    </div>
+                    <% }); %>
+            </div>
+        </div>
+    </div>
+
+    <button class="save-fab" onclick="guardarNotas()" title="Guardar Notas"><i class="fas fa-save"></i></button>
+    <div class="save-label">Guardar Cambios</div>
+
+    <script>
+        async function guardarNotas() {
+            const btn = document.querySelector('.save-fab');
+            const icon = btn.querySelector('i');
+
+            // Efecto visual de carga
+            icon.className = 'fas fa-spinner fa-spin';
+            btn.disabled = true;
+
+            const estudiantesRows = document.querySelectorAll('.student-row');
+            const datos = [];
+
+            estudiantesRows.forEach(row => {
+                const id = row.getAttribute('data-id');
+                const notaAcad = row.querySelector('.input-academico').value;
+                const notaVal = row.querySelector('.input-valores').value;
+
+                // Solo enviamos si al menos uno tiene dato, o si se está borrando
+                datos.push({
+                    id: id,
+                    nota: notaAcad,
+                    valores: notaVal
+                });
+            });
+
+            try {
+                const response = await fetch('/profesores/guardar-notas', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        idCurso: '<%= curso.ID_Curso %>',
+                        corte: '<%= corte %>',
+                        notas: JSON.stringify(datos)
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    alert('✅ Notas guardadas exitosamente');
+                } else {
+                    alert('❌ Error al guardar: ' + result.message);
+                }
+            } catch (error) {
+                console.error(error);
+                alert('❌ Error de conexión');
+            } finally {
+                icon.className = 'fas fa-save';
+                btn.disabled = false;
+            }
+        }
+
+        // Validación simple en tiempo real
+        document.querySelectorAll('.grade-input').forEach(input => {
+            input.addEventListener('input', function () {
+                if (this.value > 100) this.value = 100;
+                if (this.value < 0) this.value = 0;
+            });
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <title>Reparar Inscripciones</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/styles/forms.css">
+    <link rel="stylesheet" href="/styles/menusecretaria.css">
+</head>
+<body style="background: var(--light);">
+    <div class="form-page-container" style="max-width: 800px;">
+        <div class="form-header" style="background: var(--danger);">
+            <h1><i class="fas fa-hammer"></i> Herramienta de Reparación</h1>
+            <p>Inscribir masivamente a estudiantes sin cursos.</p>
+        </div>
+        
+        <div class="form-content">
+
+            <% if (success) { %>
+                <div class="alert alert-success"><i class="fas fa-check-circle"></i> <%= success %></div>
+            <% } %>
+            <% if (error) { %>
+                <div class="alert alert-danger"><i class="fas fa-exclamation-triangle"></i> <%= error %></div>
+            <% } %>
+
+            <div class="form-section">
+                <h2 class="section-title">Inscripciones Faltantes</h2>
+                <p style="margin-bottom: 20px;">
+                    El sistema ha detectado que <strong><%= totalZombies %> estudiantes</strong> están marcados como 'Activos'
+                    pero no están inscritos en ninguna clase para el año escolar actual.
+                </p>
+                <p style="color: var(--gray); margin-bottom: 20px;">
+                    Esto ocurre si los estudiantes fueron creados <strong>antes</strong> de que se asignaran los cursos (profesor+materia)
+                    para su grado y sección.
+                </p>
+                <p>
+                    Al presionar el botón, el sistema intentará inscribir automáticamente a estos <strong><%= totalZombies %> estudiantes</strong>
+                    en las clases que les corresponden, basándose en el Grado y Sección guardados en su ficha.
+                </p>
+
+                <% if (totalZombies > 0) { %>
+                    <form method="POST" action="/admin/repair-tool/run" onsubmit="return confirm('¿Estás seguro de que deseas ejecutar el script de reparación? Esto inscribirá a <%= totalZombies %> estudiantes en sus cursos.');">
+                        <div class="btn-group" style="justify-content: center;">
+                            <button type="submit" class="btn btn-danger" style="padding: 15px 30px; font-size: 1.2rem;">
+                                <i class="fas fa-rocket"></i> Ejecutar Reparación Masiva
+                            </button>
+                        </div>
+                    </form>
+                <% } else { %>
+                    <div class="alert alert-success" style="margin-top: 20px;">
+                        <i class="fas fa-check-circle"></i> ¡No se encontraron estudiantes para reparar!
+                    </div>
+                <% } %>
+            </div>
+
+            <div class="btn-group">
+                <a href="/admin" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Volver al Admin</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

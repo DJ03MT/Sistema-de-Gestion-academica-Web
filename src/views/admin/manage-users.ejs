@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <title>Gestión de Usuarios</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/styles/forms.css">
+    <link rel="stylesheet" href="/styles/menusecretaria.css">
+</head>
+<body style="background: #f8f9fa;">
+    <div class="form-page-container" style="max-width: 1000px;">
+        <div class="form-header">
+            <h1><i class="fas fa-users-cog"></i> Gestión de Usuarios y Roles</h1>
+            <p>Asigne roles y controle el acceso de los usuarios al sistema.</p>
+        </div>
+        <div class="form-content">
+            
+            <div class="search-bar" style="margin-bottom: 20px;">
+                <input type="text" class="search-input" id="searchUsers" placeholder="Filtrar por email o rol...">
+                <button class="search-btn"><i class="fas fa-search"></i></button>
+            </div>
+
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Email</th>
+                            <th>Rol Actual</th>
+                            <th>Estado</th>
+                            <th>Cambiar Rol</th>
+                            <th>Cambiar Estado</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbodyUsers">
+                        <% usuarios.forEach(u => { %>
+                            <form method="POST" action="/admin/usuarios/<%= u.ID_Usuario %>">
+                                <tr>
+                                    <td><%= u.Email %></td>
+                                    <td><%= u.NombreRol %></td>
+                                    <td><span class="status-badge <%= u.EstaActivo ? 'status-active' : 'status-inactive' %>"><%= u.EstaActivo ? 'Activo' : 'Inactivo' %></span></td>
+                                    <td>
+                                        <select name="ID_Rol" class="form-group" style="padding: 5px;">
+                                            <% roles.forEach(rol => { %>
+                                                <option value="<%= rol.ID_Rol %>" <%= (rol.NombreRol == u.NombreRol) ? 'selected' : '' %>>
+                                                    <%= rol.NombreRol %>
+                                                </option>
+                                            <% }); %>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <select name="EstaActivo" class="form-group" style="padding: 5px;">
+                                            <option value="1" <%= u.EstaActivo ? 'selected' : '' %>>Activo</option>
+                                            <option value="0" <%= !u.EstaActivo ? 'selected' : '' %>>Inactivo</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <button type="submit" class="btn btn-primary" style="padding: 5px 10px;">Guardar</button>
+                                    </td>
+                                </tr>
+                            </form>
+                        <% }); %>
+                    </tbody>
+                </table>
+            </div>
+            <div class="btn-group">
+                <a href="/admin" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Volver al Admin</a>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('searchUsers');
+            const tableBody = document.getElementById('tbodyUsers');
+            const rows = tableBody.querySelectorAll('tr');
+
+            searchInput.addEventListener('keyup', function() {
+                const query = searchInput.value.toLowerCase();
+
+                rows.forEach(row => {
+                    // Celdas 0 (Email) y 1 (Rol)
+                    const email = row.querySelectorAll('td')[0]?.textContent.toLowerCase() || '';
+                    const rol = row.querySelectorAll('td')[1]?.textContent.toLowerCase() || '';
+                    
+                    if (email.includes(query) || rol.includes(query)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

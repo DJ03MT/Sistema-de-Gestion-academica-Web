@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <title>Gestión de Criterios</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/styles/forms.css">
+    <link rel="stylesheet" href="/styles/menusecretaria.css">
+</head>
+<body style="background: var(--light);">
+    <div class="form-page-container" style="max-width: 1200px;">
+        <div class="form-header">
+            <h1><i class="fas fa-tasks"></i> Gestión de Criterios</h1>
+            <p>Crear y asignar los criterios de evaluación (ej: C1-A1, C1-A2...) a los cursos.</p>
+        </div>
+        
+         <div class="form-content">
+            <div class="form-section">
+                <h2 class="section-title">Crear Criterios en Lote (4 Cortes)</h2>
+                <p style="margin-bottom: 20px;">Seleccione un curso que aún no tenga criterios. Esto creará automáticamente los 20 criterios (C1-A1... C4-Coev) para ese curso.</p>
+                
+                <form method="POST" action="/admin/criterios/bulk-create">
+                    <div class="form-grid" style="grid-template-columns: 3fr 1fr;">
+                        <div class="form-group">
+                            <label>Seleccionar Curso (Solo aparecen cursos sin criterios)</label>
+                            <select name="ID_Curso" required class="form-control">
+                                <option value="">-- Seleccione un Curso --</option>
+                                <% cursosSinCriterios.forEach(c => { %>
+                                    <option value="<%= c.ID_Curso %>">
+                                        <%= c.NombreGrado %> "<%= c.NombreSeccion %>" - <%= c.NombreAsignatura %> (Prof. <%= c.PRIMER_APELLIDO %>)
+                                    </option>
+                                <% }); %>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>&nbsp;</label>
+                            <button type="submit" class="btn btn-primary" style="width: 100%;">
+                                <i class="fas fa-cogs"></i> Crear Criterios
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="form-section">
+                <h2 class="section-title">Cursos que YA Tienen Criterios</h2>
+                <div class="table-container">
+                    <table class="data-table">
+                         <thead>
+                            <tr>
+                                <th>Curso</th>
+                                <th>Grado/Sección</th>
+                                <th>Criterios Creados</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% cursosConCriterios.forEach(c => { %>
+                                <tr>
+                                    <td><%= c.NombreAsignatura %></td>
+                                    <td><%= c.NombreGrado %> "<%= c.NombreSeccion %>"</td>
+                                    <td><span class="status-badge status-active"><%= c.TotalCriterios %> Criterios</span></td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+             <div class="btn-group">
+                <a href="/admin" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Volver al Admin</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

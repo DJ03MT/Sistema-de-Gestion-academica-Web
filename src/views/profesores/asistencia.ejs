@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Asistencia - <%= curso.NombreAsignatura %>
+    </title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/styles/menuprofesores.css">
+    <style>
+        /* Estilos específicos para asistencia */
+        .toolbar {
+            background: white;
+            padding: 15px 25px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .date-picker-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .date-input {
+            padding: 10px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-family: inherit;
+            font-weight: 600;
+            color: var(--dark);
+            outline: none;
+        }
+
+        .date-input:focus {
+            border-color: var(--primary);
+        }
+
+        .student-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .student-row {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+            transition: transform 0.2s;
+        }
+
+        /* Botones de estado */
+        .attendance-options {
+            display: flex;
+            gap: 8px;
+        }
+
+        .att-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            font-weight: 700;
+            color: #aaa;
+            background: #f0f0f0;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Estados Activos */
+        .att-btn.present.active {
+            background: #2ecc71;
+            color: white;
+            transform: scale(1.1);
+            box-shadow: 0 4px 10px rgba(46, 204, 113, 0.4);
+        }
+
+        .att-btn.absent.active {
+            background: #e74c3c;
+            color: white;
+            transform: scale(1.1);
+            box-shadow: 0 4px 10px rgba(231, 76, 60, 0.4);
+        }
+
+        .att-btn.late.active {
+            background: #f1c40f;
+            color: white;
+            transform: scale(1.1);
+            box-shadow: 0 4px 10px rgba(241, 196, 15, 0.4);
+        }
+
+        .att-btn.justified.active {
+            background: #3498db;
+            color: white;
+            transform: scale(1.1);
+            box-shadow: 0 4px 10px rgba(52, 152, 219, 0.4);
+        }
+
+        /* Hover suave */
+        .att-btn:hover {
+            opacity: 0.8;
+        }
+
+        .save-fab {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--primary);
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            border: none;
+            cursor: pointer;
+            transition: transform 0.3s;
+            z-index: 100;
+        }
+
+        .save-fab:hover {
+            transform: scale(1.1);
+        }
+
+        /* Estilos Mobile */
+        @media (max-width: 600px) {
+            .student-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .attendance-options {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .att-btn {
+                width: 100%;
+                border-radius: 8px;
+                height: 45px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <div class="sidebar">
+            <div class="user-profile">
+                <div class="avatar"><img src="<%= user.photo %>" alt="User" class="user-photo"></div>
+                <div class="user-name">Profesor</div>
+            </div>
+            <ul class="nav-links">
+                <li><a href="/profesores" class="nav-link"><i class="fas fa-arrow-left"></i> Volver</a></li>
+            </ul>
+        </div>
+
+        <div class="main-content">
+            <div class="content-header">
+                <div>
+                    <h1>Asistencia: <%= curso.NombreAsignatura %>
+                    </h1>
+                    <p>
+                        <%= curso.NombreGrado %> - Sección "<%= curso.NombreSeccion %>"
+                    </p>
+                </div>
+            </div>
+
+            <div class="toolbar">
+                <div class="date-picker-container">
+                    <label>Fecha:</label>
+                    <input type="date" id="fecha-asistencia" class="date-input">
+                </div>
+                <button class="btn-primary" onclick="marcarTodosPresente()"
+                    style="padding: 8px 15px; border-radius: 8px; border: none; background: #2ecc71; color: white; cursor: pointer;">
+                    <i class="fas fa-check-double"></i> Todos Presentes
+                </button>
+            </div>
+
+            <div class="student-list">
+                <% estudiantes.forEach(est=> { %>
+                    <div class="student-row" data-id="<%= est.ID_Inscripcion %>">
+                        <div class="student-info">
+                            <div class="student-name">
+                                <%= est.PRIMER_APELLIDO %>
+                                    <%= est.SEGUNDO_APELLIDO %>, <%= est.PRIMER_NOMBRE %>
+                            </div>
+                            <div class="student-code"><i class="fas fa-id-card"></i>
+                                <%= est.CODIGO_ESTUDIANTE %>
+                            </div>
+                        </div>
+
+                        <div class="attendance-options">
+                            <button type="button" class="att-btn present active" onclick="selectStatus(this, 'P')"
+                                title="Presente">P</button>
+                            <button type="button" class="att-btn absent" onclick="selectStatus(this, 'A')"
+                                title="Ausente">A</button>
+                            <button type="button" class="att-btn late" onclick="selectStatus(this, 'T')"
+                                title="Tarde">T</button>
+                            <button type="button" class="att-btn justified" onclick="selectStatus(this, 'J')"
+                                title="Justificada">J</button>
+                        </div>
+                    </div>
+                    <% }); %>
+            </div>
+        </div>
+    </div>
+
+    <button class="save-fab" onclick="guardarAsistencia()" title="Guardar Asistencia"><i
+            class="fas fa-save"></i></button>
+
+    <script>
+        // 1. Poner fecha de hoy por defecto
+        document.addEventListener('DOMContentLoaded', () => {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('fecha-asistencia').value = today;
+        });
+
+        // 2. Lógica de selección de botones
+        function selectStatus(btn, status) {
+            const parent = btn.parentElement;
+            // Quitar active de los hermanos
+            parent.querySelectorAll('.att-btn').forEach(b => b.classList.remove('active'));
+            // Poner active al clickeado
+            btn.classList.add('active');
+            // Guardar el valor en el atributo del padre para leerlo fácil luego
+            parent.setAttribute('data-selected', status);
+        }
+
+        // 3. Marcar todos como presentes
+        function marcarTodosPresente() {
+            document.querySelectorAll('.attendance-options').forEach(opt => {
+                opt.setAttribute('data-selected', 'P');
+                opt.querySelectorAll('.att-btn').forEach(b => b.classList.remove('active'));
+                opt.querySelector('.present').classList.add('active');
+            });
+        }
+
+        // 4. Guardar en BD
+        async function guardarAsistencia() {
+            const fecha = document.getElementById('fecha-asistencia').value;
+            if (!fecha) return alert("Seleccione una fecha");
+
+            const btnSave = document.querySelector('.save-fab');
+            btnSave.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            btnSave.disabled = true;
+
+            const asistencias = [];
+            document.querySelectorAll('.student-row').forEach(row => {
+                const id = row.getAttribute('data-id');
+                // Por defecto es 'P' si no se ha tocado nada (porque el HTML tiene 'active' en P)
+                const statusContainer = row.querySelector('.attendance-options');
+                const status = statusContainer.getAttribute('data-selected') || 'P';
+
+                asistencias.push({ id, status });
+            });
+
+            try {
+                const response = await fetch('/profesores/guardar-asistencia', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ fecha, asistencias })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    alert('✅ Asistencia guardada con éxito');
+                } else {
+                    alert('❌ Error: ' + data.message);
+                }
+            } catch (e) {
+                console.error(e);
+                alert('❌ Error de conexión');
+            } finally {
+                btnSave.innerHTML = '<i class="fas fa-save"></i>';
+                btnSave.disabled = false;
+            }
+        }
+    </script>
+</body>
+
+</html>

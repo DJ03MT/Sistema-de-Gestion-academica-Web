@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nuevo Profesor</title>
+    <link rel="stylesheet" href="/styles/form.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* Los estilos CSS de menusecretaria.css ya están incluidos en form.css, 
+           así que esta sección de estilo se puede simplificar o mover a form.css */
+           
+        body { background: #f8f9fa; }
+        .form-container { 
+            background: white; 
+            padding: 30px; 
+            border-radius: 16px; 
+            max-width: 800px; 
+            margin: 40px auto; 
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+        }
+        
+        /* Ajustes menores (form.css ya maneja la mayoría) */
+        .form-group.full-width { grid-column: 1 / -1; }
+        .form-actions { 
+            display: flex; 
+            gap: 15px; 
+            margin-top: 20px; 
+            padding-top: 20px; 
+            border-top: 1px solid #e9ecef;
+        }
+    </style>
+</head>
+<body style="background: var(--light);">
+    <div class="form-page-container" style="max-width: 900px;">
+        <div class="form-header">
+            <h1><i class="fas fa-user-plus"></i> Agregar Nuevo Profesor</h1>
+            <p>Complete los datos biográficos del docente.</p>
+        </div>
+        
+        <div class="form-content">
+            <form action="/secretaria/profesores" method="POST">
+                
+                <div class="form-section">
+                    <h2 class="section-title">Información Personal</h2>
+                    <div class="form-grid">
+                        
+                        <div class="form-group">
+                            <label class="required" for="primer_nombre">Primer Nombre:</label>
+                            <input type="text" id="primer_nombre" name="PRIMER_NOMBRE" class="form-control" required 
+                                   oninput="this.value = this.value.toUpperCase()" maxlength="100">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="segundo_nombre">Segundo Nombre:</label>
+                            <input type="text" id="segundo_nombre" name="SEGUNDO_NOMBRE" class="form-control"
+                                   oninput="this.value = this.value.toUpperCase()" maxlength="100">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="required" for="primer_apellido">Primer Apellido:</label>
+                            <input type="text" id="primer_apellido" name="PRIMER_APELLIDO" class="form-control" required
+                                   oninput="this.value = this.value.toUpperCase()" maxlength="100">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="segundo_apellido">Segundo Apellido:</label>
+                            <input type="text" id="segundo_apellido" name="SEGUNDO_APELLIDO" class="form-control"
+                                   oninput="this.value = this.value.toUpperCase()" maxlength="100">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="cedula">Cédula Identidad:</label>
+                            <input type="text" id="cedula" name="CEDULA_IDENTIDAD" class="form-control"
+                                   oninput="this.value = this.value.toUpperCase()"
+                                   placeholder="001-010180-0001A" maxlength="16"
+                                   pattern="\d{3}-\d{6}-\d{4}[A-Z]{1}" 
+                                   title="Formato esperado: 001-010180-0001A">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="cargo_real">Cargo Real:</label>
+                            <input type="text" id="cargo_real" name="CARGO_REAL" class="form-control"
+                                   oninput="this.value = this.value.toUpperCase()" maxlength="150">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h2 class="section-title">Información Académica y Laboral</h2>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="especialidad">Especialidad:</label>
+                            <input type="text" id="especialidad" name="ESPECIALIDAD_DOCENTE" class="form-control"
+                                   oninput="this.value = this.value.toUpperCase()" maxlength="255">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="carga_horaria">Carga Horaria:</label>
+                            <input type="text" id="carga_horaria" name="CARGA_HORARIA" class="form-control"
+                                   oninput="this.value = this.value.toUpperCase()" 
+                                   placeholder="Ej: 40 HORAS" maxlength="20">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="titulos">Títulos:</label>
+                            <input type="text" id="titulos" name="TITULOS" class="form-control"
+                                   oninput="this.value = this.value.toUpperCase()" 
+                                   placeholder="Ej: LIC. EN MATEMÁTICAS" maxlength="200">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="turno">Turno:</label>
+                            <input type="text" id="turno" name="TURNO" class="form-control"
+                                   oninput="this.value = this.value.toUpperCase()" 
+                                   placeholder="Ej: MATUTINO" maxlength="20">
+                        </div>
+                        
+                        <div class="form-group full-width">
+                            <label for="observaciones">Observaciones:</label>
+                            <textarea id="observaciones" name="OBSERVACIONES" class="form-control"
+                                      oninput="this.value = this.value.toUpperCase()"
+                                      placeholder="Anotaciones adicionales..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Guardar Profesor
+                    </button>
+                    <a href="/secretaria" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const cedulaInput = document.getElementById('cedula');
+            
+            if(cedulaInput) {
+                cedulaInput.addEventListener('input', function(e) {
+                    let value = e.target.value.replace(/[^a-zA-Z0-9]/g, ''); // Limpiar
+                    let formatted = '';
+
+                    if (value.length > 0) {
+                        formatted = value.substring(0, 3);
+                    }
+                    if (value.length > 3) {
+                        formatted += '-' + value.substring(3, 9);
+                    }
+                    if (value.length > 9) {
+                        formatted += '-' + value.substring(9, 13);
+                    }
+                    if (value.length > 13) {
+                        // Forzar última letra a mayúscula
+                        formatted += value.substring(13, 14).toUpperCase(); 
+                    }
+                    
+                    e.target.value = formatted;
+                });
+            }
+        });
+    </script>
+</body>
+</html>

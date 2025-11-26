@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Centro de Ayuda - Sistema CEO</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/styles/ayuda.css">
+</head>
+<body>
+    
+    <div class="chat-container">
+        <header class="chat-header">
+            <img src="/img/logo-sin-fondo.png" alt="Logo" class="logo">
+            <div class="header-info">
+                <h2>Asistente Virtual CEO</h2>
+                <p><i class="fas fa-circle online"></i> En línea</p>
+            </div>
+        </header>
+
+        <div class="chat-body" id="chat-body">
+            </div>
+
+        <footer class="chat-input-area">
+            <form id="chat-form">
+                <input type="text" id="user-input" placeholder="Escribe tu pregunta aquí..." autocomplete="off">
+                <button type="submit" id="send-btn">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </form>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const chatBody = document.getElementById('chat-body');
+            const chatForm = document.getElementById('chat-form');
+            const userInput = document.getElementById('user-input');
+            let currentButtons = null; // Para guardar los botones actuales
+
+            // --- CEREBRO DEL BOT ---
+            const botBrain = {
+                // Punto de inicio
+                'main_menu': {
+                    text: "¡Hola! 👋 Soy el Asistente Virtual CEO. Para ayudarte mejor, dime qué rol tienes o cuál es tu problema.",
+                    buttons: [
+                        { text: "Soy Profesor", key: "menu_profesor" },
+                        { text: "Soy Secretaría", key: "menu_secretaria" },
+                        { text: "Soy Director / Admin", key: "menu_director" },
+                        { text: "Tengo problemas de acceso", key: "problemas_acceso" }
+                    ]
+                },
+                
+                // --- 0. FLUJO DE ACCESO ---
+                'problemas_acceso': {
+                    text: "Entendido. ¿Cuál es tu problema de acceso?",
+                    buttons: [
+                        { text: "No puedo iniciar sesión", key: "no_puedo_iniciar" },
+                        { text: "Mi panel es incorrecto", key: "rol_incorrecto" },
+                        { text: "Volver al menú", key: "main_menu" }
+                    ]
+                },
+                'no_puedo_iniciar': {
+                    text: "Recuerda: <strong>Solo puedes iniciar sesión con tu correo institucional</strong> (`nombre@ceenriquedeosso.edu.ni`). Si usas un Gmail personal, no funcionará. <br><br>Si estás seguro de que usas el correo correcto y no funciona, es posible que tu cuenta no esté activa.",
+                    buttons: [
+                        { text: "Contactar a Soporte", key: "contacto" },
+                        { text: "Volver al menú", key: "main_menu" }
+                    ]
+                },
+                'rol_incorrecto': {
+                    text: "Esto sucede si tu cuenta tiene un rol equivocado (ej. eres Director pero entras como Profesor). Por favor, contacta a soporte para que corrijan tus permisos.",
+                    buttons: [
+                        { text: "Contactar a Soporte", key: "contacto" },
+                        { text: "Volver al menú", key: "main_menu" }
+                    ]
+                },
+
+                // --- 1. FLUJO DE PROFESOR ---
+                'menu_profesor': {
+                    text: "¡Hola, Profe! ¿Sobre qué es tu consulta?",
+                    buttons: [
+                        { text: "¿Dónde subo notas?", key: "donde_subo_notas" },
+                        { text: "Me faltan alumnos/cursos", key: "faltan_alumnos" },
+                        { text: "¿Cómo imprimo mis notas?", key: "imprimir_profesor" },
+                        { text: "Volver al menú", key: "main_menu" }
+                    ]
+                },
+                'donde_subo_notas': {
+                    text: "En tu panel, ve a la pestaña <strong>'Subir Notas'</strong>. Verás tus cursos en paneles desplegables. Ábrelos y podrás llenar la tabla de criterios.",
+                    buttons: [
+                        { text: "Gracias", key: "main_menu" },
+                        { text: "Volver al menú de Profesor", key: "menu_profesor" }
+                    ]
+                },
+                'faltan_alumnos': {
+                    text: "Si te faltan alumnos en la lista o no ves tus cursos correctos, es probable que <strong>Secretaría</strong> aún no haya finalizado la asignación de cargas académicas. <br><br>Por favor, comunícate con Secretaría para que revisen tu asignación.",
+                    buttons: [
+                        { text: "Entendido", key: "main_menu" },
+                        { text: "Volver al menú de Profesor", key: "menu_profesor" }
+                    ]
+                },
+                'imprimir_profesor': {
+                    text: "Actualmente, la función de 'Imprimir Sábana de Notas' está en desarrollo. Por ahora, puedes usar la función de impresión de tu navegador (<strong>Ctrl + P</strong>) dentro de la pestaña 'Subir Notas' para un reporte rápido.",
+                    buttons: [
+                        { text: "Entendido", key: "main_menu" },
+                        { text: "Volver al menú de Profesor", key: "menu_profesor" }
+                    ]
+                },
+
+                // --- 2. FLUJO DE SECRETARÍA ---
+                'menu_secretaria': {
+                    text: "¡Hola! ¿Qué gestión de Secretaría necesitas realizar?",
+                    buttons: [
+                        { text: "¿Cómo inscribo un alumno?", key: "inscribir_alumno" },
+                        { text: "¿Cómo retiro un alumno?", key: "retirar_alumno" },
+                        { text: "¿Cómo creo un profesor?", key: "crear_profesor" },
+                        { text: "Volver al menú", key: "main_menu" }
+                    ]
+                },
+                'inscribir_alumno': {
+                    text: "Ve a <strong>'Gestión de Alumnos'</strong> y haz clic en el botón azul <strong>'Nuevo Estudiante'</strong>. Deberás llenar toda la ficha biográfica y académica, incluyendo el grado y sección al que se inscribe.",
+                    buttons: [
+                        { text: "Entendido", key: "main_menu" },
+                        { text: "Volver al menú de Secretaría", key: "menu_secretaria" }
+                    ]
+                },
+                'retirar_alumno': {
+                    text: "En <strong>'Gestión de Alumnos'</strong>, busca al estudiante en la lista y haz clic en el botón rojo <strong>'Retirar'</strong>. Deberás escribir un motivo (ej. 'Traslado') para confirmar la baja.",
+                    buttons: [
+                        { text: "Entendido", key: "main_menu" },
+                        { text: "Volver al menú de Secretaría", key: "menu_secretaria" }
+                    ]
+                },
+                'crear_profesor': {
+                    text: "Ve a <strong>'Gestión de Profesores'</strong> y haz clic en <strong>'Nuevo Profesor'</strong>. Llena sus datos biográficos. <br><br><strong>Importante:</strong> El profesor debe iniciar sesión *una vez* (y fallar) para que su correo aparezca en el panel del Director y puedas asignarle el rol.",
+                    buttons: [
+                        { text: "Entendido", key: "main_menu" },
+                        { text: "Volver al menú de Secretaría", key: "menu_secretaria" }
+                    ]
+                },
+
+                // --- 3. FLUJO DE DIRECTOR ---
+                'menu_director': {
+                    text: "¡Hola, Director! ¿Qué deseas administrar hoy?",
+                    buttons: [
+                        { text: "Asignar profesor a clase", key: "asignar_clase" },
+                        { text: "Crear/Activar un usuario", key: "crear_usuario" },
+                        { text: "Activar Año Escolar", key: "activar_anio" },
+                        { text: "Volver al menú", key: "main_menu" }
+                    ]
+                },
+                'asignar_clase': {
+                    text: "Ve al Panel de Admin y entra a <strong>'Gestionar Cursos'</strong>. Desde ahí, podrás seleccionar un profesor, una asignatura, un grado y una sección para crear la asignación de ese curso.",
+                    buttons: [
+                        { text: "Entendido", key: "main_menu" },
+                        { text: "Volver al menú de Director", key: "menu_director" }
+                    ]
+                },
+                'crear_usuario': {
+                    text: "Primero, la persona (profesor, secretaria) debe <strong>intentar iniciar sesión con su correo institucional</strong> (`@ceenriquedeosso.edu.ni`). <br><br>Una vez que lo haga, aparecerá en tu panel de <strong>'Gestionar Usuarios'</strong> con rol 'Pendiente'. Entra ahí, busca su correo y asígnale el rol correcto (ej. 'PROFESORES') y pon su estado en 'Activo'.",
+                    buttons: [
+                        { text: "Entendido", key: "main_menu" },
+                        { text: "Volver al menú de Director", key: "menu_director" }
+                    ]
+                },
+                'activar_anio': {
+                    text: "En el Panel de Admin, ve a <strong>'Año Lectivo'</strong>. Crea el nuevo año (ej. 2026) y luego haz clic en el botón <strong>'Activar'</strong>. <br><br><strong>¡Cuidado!</strong> Esto cerrará el año actual y los profesores solo verán los cursos y alumnos del nuevo año.",
+                    buttons: [
+                        { text: "Entendido", key: "main_menu" },
+                        { text: "Volver al menú de Director", key: "menu_director" }
+                    ]
+                },
+
+                // --- 4. FALLBACK Y CONTACTO ---
+                'contacto': {
+                    text: "Para soporte técnico, contacta a los administradores: <ul><li><i class='fab fa-whatsapp'></i> <strong>WhatsApp:</strong> <a href='https://wa.me/50577410650' target='_blank'>+505 7741 0650</a></li><li><i class='fas fa-envelope'></i> <strong>Correo:</strong> <a href='mailto:andrea.rivas41i@std.uni.edu.ni'>andrea.rivas41i@std.uni.edu.ni</a></li></ul>",
+                    buttons: [
+                        { text: "Volver al menú principal", key: "main_menu" }
+                    ]
+                },
+                'default': {
+                    text: "No entendí muy bien esa pregunta. 😕 Si no ves una opción que te ayude, te recomiendo contactar al soporte.",
+                    buttons: [
+                        { text: "Ver información de contacto", key: "contacto" },
+                        { text: "Volver al menú principal", key: "main_menu" }
+                    ]
+                }
+            };
+            // --- FIN DEL CEREBRO ---
+
+
+            // Limpia los botones de respuesta rápida
+            function clearButtons() {
+                if (currentButtons) {
+                    chatBody.removeChild(currentButtons);
+                    currentButtons = null;
+                }
+            }
+
+            // Añade un mensaje al chat
+            function addMessage(message, sender, buttons = []) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${sender}`;
+                messageDiv.innerHTML = message;
+                chatBody.appendChild(messageDiv);
+
+                if (buttons.length > 0) {
+                    clearButtons(); 
+                    const buttonContainer = document.createElement('div');
+                    buttonContainer.className = 'button-container';
+                    buttons.forEach(btn => {
+                        const button = document.createElement('button');
+                        button.className = 'qr-btn';
+                        button.textContent = btn.text;
+                        button.setAttribute('data-key', btn.key);
+                        buttonContainer.appendChild(button);
+                    });
+                    chatBody.appendChild(buttonContainer);
+                    currentButtons = buttonContainer;
+                }
+                
+                chatBody.scrollTop = chatBody.scrollHeight;
+            }
+
+            // Muestra el indicador de "escribiendo..."
+            function showTypingIndicator() {
+                const typingDiv = document.createElement('div');
+                typingDiv.className = 'message bot typing-indicator';
+                typingDiv.innerHTML = '<span></span><span></span><span></span>';
+                chatBody.appendChild(typingDiv);
+                chatBody.scrollTop = chatBody.scrollHeight;
+                return typingDiv;
+            }
+
+            // Procesa la entrada (de texto o de botón)
+            function processInput(key, userText) {
+                if (userText) {
+                    addMessage(userText, 'user');
+                }
+                
+                clearButtons();
+                userInput.disabled = true;
+
+                const response = botBrain[key] || botBrain['default'];
+
+                const typingIndicator = showTypingIndicator();
+                setTimeout(() => {
+                    chatBody.removeChild(typingIndicator);
+                    addMessage(response.text, 'bot', response.buttons);
+                    userInput.disabled = false;
+                    userInput.focus();
+                }, 800 + Math.random() * 400);
+            }
+
+            // Maneja el clic en los botones de respuesta rápida
+            chatBody.addEventListener('click', (e) => {
+                if (e.target.classList.contains('qr-btn')) {
+                    const key = e.target.getAttribute('data-key');
+                    const text = e.target.textContent;
+                    addMessage(text, 'user'); 
+                    processInput(key, null); 
+                }
+            });
+
+            // Maneja el envío del formulario de texto
+            chatForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const text = userInput.value;
+                if (text.trim() === '') return;
+                
+                const lowerText = text.toLowerCase();
+                let key = 'default'; // Por defecto, no entiende
+
+                // Palabras clave para texto libre
+                if (lowerText.includes('iniciar') || lowerText.includes('sesión') || lowerText.includes('entrar') || lowerText.includes('acceso')) {
+                    key = 'problemas_acceso';
+                } else if (lowerText.includes('notas') || lowerText.includes('calificaciones') || lowerText.includes('subir')) {
+                    key = 'donde_subo_notas';
+                } else if (lowerText.includes('alumno') || lowerText.includes('inscribir') || lowerText.includes('matricular')) {
+                    key = 'inscribir_alumno';
+                } else if (lowerText.includes('retirar') || lowerText.includes('baja')) {
+                    key = 'retirar_alumno';
+                } else if (lowerText.includes('nuevo profesor') || lowerText.includes('crear profe')) {
+                    key = 'crear_profesor';
+                } else if (lowerText.includes('asignar') || lowerText.includes('clase') || lowerText.includes('curso')) {
+                    key = 'asignar_clase';
+                } else if (lowerText.includes('rol') || lowerText.includes('permisos') || lowerText.includes('usuario')) {
+                    key = 'crear_usuario';
+                } else if (lowerText.includes('año') || lowerText.includes('activar') || lowerText.includes('nuevo año')) {
+                    key = 'activar_anio';
+                } else if (lowerText.includes('ayuda') || lowerText.includes('contacto') || lowerText.includes('soporte') || lowerText.includes('otra')) {
+                    key = 'contacto';
+                }
+
+                processInput(key, text); // Procesa la clave encontrada
+                userInput.value = '';
+            });
+
+            // Mensaje de bienvenida inicial
+            setTimeout(() => {
+                const welcome = botBrain['main_menu'];
+                addMessage(welcome.text, 'bot', welcome.buttons);
+            }, 500);
+        });
+    </script>
+</body>
+</html>

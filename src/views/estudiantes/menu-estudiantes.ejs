@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel Estudiantil - Sistema CEO</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="/styles/menusecretaria.css">
+  <style>
+    .matricula-cta {
+      background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+      color: white;
+      padding: 30px;
+      border-radius: var(--border-radius);
+      text-align: center;
+      box-shadow: var(--box-shadow);
+    }
+
+    .matricula-cta h2 {
+      font-size: 2rem;
+      margin-bottom: 10px;
+    }
+
+    .matricula-cta p {
+      font-size: 1.1rem;
+      opacity: 0.9;
+      margin-bottom: 25px;
+    }
+
+    .btn-matricula {
+      background: white;
+      color: var(--primary-dark);
+      padding: 15px 30px;
+      font-size: 1.2rem;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn-matricula:hover {
+      background: #f0f0f0;
+      transform: translateY(-3px);
+    }
+
+    .alert-warning {
+      background-color: #fff3cd;
+      color: #856404;
+      padding: 20px;
+      border-radius: var(--border-radius);
+      text-align: center;
+    }
+
+    .alert-success {
+      background-color: #d4edda;
+      color: #155724;
+      padding: 20px;
+      border-radius: var(--border-radius);
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="dashboard-container">
+    <div class="sidebar">
+      <div class="user-profile">
+        <div class="avatar">
+          <img src="<%= user.photo %>" alt="Foto" class="user-photo">
+        </div>
+        <div class="user-name">
+          <%= estudiante.PRIMER_NOMBRE %> <%= estudiante.PRIMER_APELLIDO %>
+        </div>
+        <div class="user-info">
+          Estudiante (<%= infoMatricula.gradoActual %>)
+        </div>
+      </div>
+
+      <ul class="nav-links">
+        <li><a href="#" class="nav-link active" data-section="welcome"><i class="fas fa-home"></i> Inicio</a></li>
+        <li><a href="#" class="nav-link" data-section="notas"><i class="fas fa-clipboard-list"></i> Mis Notas</a></li>
+        <li><a href="#" class="nav-link" data-section="perfil"><i class="fas fa-user"></i> Mi Perfil</a></li>
+      </ul>
+
+      <div class="logout-section">
+        <a href="/logout" class="logout-btn" id="logoutBtnLink"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
+      </div>
+    </div>
+
+    <div class="main-content">
+
+      <div id="welcome" class="content-section active">
+        <div class="content-header">
+          <h1>Bienvenido, <%= estudiante.PRIMER_NOMBRE %></h1>
+          <p>Panel Estudiantil - Año Lectivo <%= infoMatricula.anioActivo %></p>
+        </div>
+
+        <div class="welcome-section" style="text-align: left; padding: 0;">
+
+          <% if (infoMatricula.error) { %>
+          <div class="alert alert-warning">
+            <h3 style="margin-bottom: 10px;"><i class="fas fa-exclamation-triangle"></i> Notificación de Matrícula</h3>
+            <p><%= infoMatricula.error %></p>
+          </div>
+
+          <% } else if (infoMatricula.yaMatriculado) { %>
+          <div class="alert alert-success">
+            <h3 style="margin-bottom: 10px;"><i class="fas fa-check-circle"></i> Matrícula <%= infoMatricula.anioSiguiente %> Completada</h3>
+            <p>¡Gracias! Ya recibimos tu hoja de matrícula. Tu estado actual es: <strong><%= infoMatricula.estadoMatricula %></strong>.</p>
+          </div>
+
+          <% } else if (infoMatricula.estadoEstudiante === 'Graduado') { %>
+          <div class="matricula-cta">
+            <h2>¡FELICIDADES, <%= estudiante.PRIMER_NOMBRE %>!</h2>
+            <p>Has completado con éxito tus estudios de secundaria. ¡Te deseamos lo mejor en tu futuro!</p>
+          </div>
+
+          <% } else if (infoMatricula.idGradoDestino) { %>
+          <div class="matricula-cta">
+            <h2>Portal de Matrícula <%= infoMatricula.anioSiguiente %></h2>
+            <p>Tu matrícula está disponible para <strong><%= infoMatricula.gradoDestino %></strong>.
+              Por favor, actualiza tus datos para confirmar tu cupo.</p>
+
+            <a href="/estudiantes/matricular" class="btn btn-matricula">
+              <i class="fas fa-file-signature"></i> Llenar Hoja de Matrícula
+            </a>
+          </div>
+          <% } %>
+        </div>
+      </div>
+      <div id="notas" class="content-section">
+        <div class="content-header">
+          <h1><i class="fas fa-clipboard-list"></i> Mis Calificaciones</h1>
+          <p>Consulta tus notas del año actual y genera tu boletín.</p>
+        </div>
+
+        <div class="section-container" style="max-width: 600px; margin: 20px auto; text-align: center;">
+          <h2 class="section-title" style="border: none; display: block; text-align: center; margin-bottom: 20px;">Boletín del Año <%= infoMatricula.anioActivo %></h2>
+          <p style="color: var(--gray); margin-bottom: 25px;">
+            Haz clic en el botón para generar una vista PDF de tu boletín académico para el año escolar actual.
+          </p>
+          <a href="/estudiantes/boletin-pdf" target="_blank" class="btn btn-primary" style="padding: 12px 25px; font-size: 1.1rem;">
+            <i class="fas fa-file-pdf"></i> Generar Boletín en PDF
+          </a>
+        </div>
+      </div>
+      <div id="perfil" class="content-section">
+        <div class="content-header">
+          <h1><i class="fas fa-user"></i> Mi Perfil</h1>
+          <p>Información de tu ficha de matrícula activa.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+<script>
+  // Script de navegación simple
+  document.addEventListener('DOMContentLoaded', function() {
+    const navLinks = document.querySelectorAll('.nav-link');
+    const contentSections = document.querySelectorAll('.content-section');
+    navLinks.forEach(link => {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        navLinks.forEach(item => item.classList.remove('active'));
+        this.classList.add('active');
+        const sectionId = this.getAttribute('data-section');
+        contentSections.forEach(section => section.classList.remove('active'));
+        document.getElementById(sectionId).classList.add('active');
+      });
+    });
+  });
+</script>
+</body>
+
+</html>

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel de Administración</title>
+  <link rel="stylesheet" href="/styles/menusecretaria.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="/styles/form.css">
+  <style>
+    body {
+      background: #f8f9fa;
+      padding: 20px;
+    }
+
+    .admin-menu {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      max-width: 1000px;
+      margin: 40px auto;
+    }
+
+    .admin-card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+      padding: 30px;
+      text-align: center;
+      text-decoration: none;
+      color: #2c3e50;
+      transition: all 0.3s ease;
+    }
+
+    .admin-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+    }
+
+    .admin-card i {
+      font-size: 3rem;
+      color: var(--primary);
+      margin-bottom: 20px;
+    }
+
+    .admin-card h2 {
+      font-size: 1.5rem;
+      margin-bottom: 10px;
+    }
+
+    .admin-card p {
+      color: #6c757d;
+    }
+  </style>
+</head>
+
+<body>
+  <h1 style="text-align: center; color: #2c3e50;">Panel de Administración (<%= user.rol %>)</h1>
+  <p style="text-align: center;">Bienvenida, <%= user.name %>.</p>
+
+  <div class="admin-menu">
+    <a href="/admin/usuarios" class="admin-card">
+      <i class="fas fa-users-cog"></i>
+      <h2>Gestionar Usuarios</h2>
+      <p>Asignar roles y activar/desactivar cuentas.</p>
+    </a>
+    <a href="/admin/globales" class="admin-card">
+      <i class="fas fa-cogs"></i>
+      <h2>Valores Globales</h2>
+      <p>Editar el Valor del Mes y el link del Calendario.</p>
+    </a>
+    <a href="/admin/cursos" class="admin-card">
+      <i class="fas fa-chalkboard-teacher"></i>
+      <h2>Gestionar Cursos</h2>
+      <p>Asignar profesores a grados y materias.</p>
+    </a>
+    <a href="/admin/anios" class="admin-card">
+      <i class="fas fa-calendar-alt"></i>
+      <h2>Año Lectivo</h2>
+      <p>Cerrar año actual y activar el siguiente.</p>
+    </a>
+    <a href="/admin/acompanantes" class="admin-card">
+      <i class="fas fa-user-friends"></i>
+      <h2>Acompañantes</h2>
+      <p>Asignar acompañantes a profesores.</p>
+    </a>
+        <a href="/admin/criterios" class="admin-card">
+      <i class="fas fa-tasks"></i>
+      <h2>Gestionar Criterios</h2>
+      <p>Crear los criterios (C1, C2...) para los cursos.</p>
+    </a>
+    <a href="/secretaria" class="admin-card" style="background: #6c757d; color: white;">
+      <i class="fas fa-arrow-left" style="color: white;"></i>
+      <h2>Ir a Secretaría</h2>
+      <p>Ir al dashboard de Secretaría.</p>
+    </a>
+    <a href="/admin/criterios" class="admin-card">
+      <i class="fas fa-tasks"></i>
+      <h2>Gestionar Criterios</h2>
+      <p>Crear los criterios (C1, C2...) para los cursos.</p>
+    </a>
+
+    <a href="/admin/fix-enrollments" class="admin-card" style="border-left: 5px solid var(--danger);">
+      <i class="fas fa-hammer" style="color: var(--danger);"></i>
+      <h2>Reparar Alumnos</h2>
+      <p>Inscribir alumnos activos sin cursos.</p>
+    </a>
+
+    <a href="/secretaria" class="admin-card" style="background: #6c757d; color: white;">
+  </div>
+  
+</body>
+
+</html>

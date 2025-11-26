@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hoja de Matrícula</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/styles/form.css">
+</head>
+<body>
+    <div class="form-page-container">
+        <div class="form-header">
+            <h1><i class="fas fa-file-signature"></i> Hoja de Matrícula <%= info.anioSiguiente %></h1>
+            <p>Estudiante: <strong><%= estudiante.PRIMER_NOMBRE %> <%= estudiante.PRIMER_APELLIDO %></strong></p>
+        </div>
+
+        <div class="form-content">
+            <% if (typeof error !== 'undefined' && error) { %>
+                <div class="alert alert-danger"><%= error %></div>
+            <% } %>
+
+            <form method="POST" action="/estudiantes/matricular">
+                <!-- Campos ocultos con la información clave -->
+                <input type="hidden" name="ID_Anio_Lectivo_Destino" value="<%= info.idAnioSiguiente %>">
+                <input type="hidden" name="ID_Grado_Destino" value="<%= info.idGradoDestino %>">
+
+                <!-- ... (Sección A - Datos Estudiante) ... -->
+                <div class="form-section">
+                    <h2 class="section-title">A - Datos del Estudiante</h2>
+                    <div class="form-grid" style="grid-template-columns: 1fr 1fr;">
+                         <div class="form-group">
+                            <label>Año Lectivo a Matricular</label>
+                            <input type="text" value="<%= info.anioSiguiente %>" readonly style="background-color: #f4f4f4;">
+                        </div>
+                        <div class="form-group">
+                            <label>Grado a Matricular</label>
+                            <input type="text" value="<%= info.gradoDestino %>" readonly style="background-color: #f4f4f4;">
+                        </div>
+                    </div>
+                    <hr style="margin: 20px 0; border: 1px solid #f0f0f0;">
+                    <div class="form-grid">
+                        <div class="form-group"><label for="LugarNacimiento">Lugar de Nacimiento</label><input type="text" id="LugarNacimiento" name="LugarNacimiento_Actualizado" value="<%= ficha.LugarNacimiento || '' %>"></div>
+                        <div class="form-group"><label for="RELIGION" class="required">Religión</label><select id="RELIGION" name="RELIGION_Actualizado" required><option value="CATÓLICO" <%= (ficha.RELIGION == 'CATÓLICO') ? 'selected' : '' %>>Católico</option><option value="EVANGÉLICO" <%= (ficha.RELIGION == 'EVANGÉLICO') ? 'selected' : '' %>>Evangélico</option><option value="CRISTIANO" <%= (ficha.RELIGION == 'CRISTIANO') ? 'selected' : '' %>>Cristiano</option><option value="OTRA" <%= (ficha.RELIGION == 'OTRA') ? 'selected' : '' %>>Otra</option><option value="NINGUNA" <%= (ficha.RELIGION == 'NINGUNA') ? 'selected' : '' %>>Ninguna</option></select></div>
+                        <div class="form-group"><label for="ConQuienVive">¿Con quién vive?</label><select id="ConQuienVive" name="ConQuienVive_Actualizado"><option value="">Seleccione</option><option value="PADRE Y MADRE" <%= (ficha.ConQuienVive == 'PADRE Y MADRE') ? 'selected' : '' %>>Padre y Madre</option><option value="PADRE" <%= (ficha.ConQuienVive == 'PADRE') ? 'selected' : '' %>>Solo Padre</option><option value="MADRE" <%= (ficha.ConQuienVive == 'MADRE') ? 'selected' : '' %>>Solo Madre</option><option value="TUTOR" <%= (ficha.ConQuienVive == 'TUTOR') ? 'selected' : '' %>>Tutor</option></select></div>
+                        <div class="form-group"><label for="ParentescoTutor">Si es Tutor, ¿parentesco?</label><input type="text" id="ParentescoTutor" name="ParentescoTutor_Actualizado" value="<%= ficha.ParentescoTutor || '' %>"></div>
+                        <div class="form-group" style="grid-column: 1 / -1;"><label for="DIAGNOSTICO_SALUD">Padecimiento o Diagnóstico</label><input type="text" id="DIAGNOSTICO_SALUD" name="DIAGNOSTICO_SALUD_Actualizado" value="<%= ficha.DIAGNOSTICO_SALUD || 'NINGUNO' %>"></div>
+                        <div class="form-group" style="grid-column: 1 / -1;"><label for="DOMICILIO" class="required">Dirección Domiciliar</label><textarea id="DOMICILIO" name="DOMICILIO_Actualizado" required rows="3"><%= ficha.DOMICILIO %></textarea></div>
+                    </div>
+                </div>
+
+                <!-- ... (Sección B - Datos Familiares) ... -->
+                <div class="form-section">
+                    <h2 class="section-title">B - Datos Familiares</h2>
+                    <div class="form-group" style="max-width: 400px; margin-bottom: 25px;">
+                        <label for="EstadoCivilPadres">Estado civil de los padres</label>
+                        <select id="EstadoCivilPadres" name="EstadoCivilPadres_Actualizado">
+                            <option value="">Seleccione</option>
+                            <option value="CASADOS" <%= (ficha.EstadoCivilPadres == 'CASADOS') ? 'selected' : '' %>>Casados</option>
+                            <option value="DIVORCIADOS" <%= (ficha.EstadoCivilPadres == 'DIVORCIADOS') ? 'selected' : '' %>>Divorciados</option>
+                            <option value="SOLTERO" <%= (ficha.EstadoCivilPadres == 'SOLTERO') ? 'selected' : '' %>>Soltero/a</option>
+                            <option value="UNION LIBRE" <%= (ficha.EstadoCivilPadres == 'UNION LIBRE') ? 'selected' : '' %>>En unión libre</option>
+                        </select>
+                    </div>
+
+                    <h3 style="color: var(--primary-dark); margin-bottom: 15px;">Datos del Padre</h3>
+                    <div class="form-grid">
+                        <div class="form-group"><label>Nombre Padre</label><input type="text" name="NombrePadre_Actualizado" value="<%= ficha.NombrePadre || '' %>"></div>
+                        <div class="form-group"><label>Cédula Padre</label><input type="text" name="CedulaPadre_Actualizado" value="<%= ficha.CedulaPadre || '' %>" placeholder="XXX-XXXXXX-XXXXL" maxlength="16"></div>
+                        <div class="form-group"><label>Nivel Académico</label><input type="text" name="NivelAcademicoPadre_Actualizado" value="<%= ficha.NivelAcademicoPadre || '' %>"></div>
+                        <div class="form-group"><label>Profesión</label><input type="text" name="ProfesionPadre_Actualizado" value="<%= ficha.ProfesionPadre || '' %>"></div>
+                        <div class="form-group"><label>Lugar de Trabajo</label><input type="text" name="LugarTrabajoPadre_Actualizado" value="<%= ficha.LugarTrabajoPadre || '' %>"></div>
+                        <div class="form-group"><label>Tel. Personal</label><input type="tel" name="TelefonoPersonalPadre_Actualizado" value="<%= ficha.TelefonoPersonalPadre || '' %>" placeholder="XXXX-XXXX" maxlength="9"></div>
+                        <div class="form-group"><label>Tel. Trabajo</label><input type="tel" name="TelefonoTrabajoPadre_Actualizado" value="<%= ficha.TelefonoTrabajoPadre || '' %>" placeholder="XXXX-XXXX" maxlength="9"></div>
+                        <div class="form-group"><label>Email</label><input type="email" name="EmailPadre_Actualizado" value="<%= ficha.EmailPadre || '' %>"></div>
+                    </div>
+
+                    <hr style="margin: 20px 0; border: 1px solid #f0f0f0;">
+
+                    <h3 style="color: var(--primary-dark); margin-bottom: 15px;">Datos de la Madre</h3>
+                    <div class="form-grid">
+                        <div class="form-group"><label>Nombre Madre</label><input type="text" name="NombreMadre_Actualizado" value="<%= ficha.NombreMadre || '' %>"></div>
+                        <div class="form-group"><label>Cédula Madre</label><input type="text" name="CedulaMadre_Actualizado" value="<%= ficha.CedulaMadre || '' %>" placeholder="XXX-XXXXXX-XXXXL" maxlength="16"></div>
+                        <div class="form-group"><label>Nivel Académico</label><input type="text" name="NivelAcademicoMadre_Actualizado" value="<%= ficha.NivelAcademicoMadre || '' %>"></div>
+                        <div class="form-group"><label>Profesión</label><input type="text" name="ProfesionMadre_Actualizado" value="<%= ficha.ProfesionMadre || '' %>"></div>
+                        <div class="form-group"><label>Lugar de Trabajo</label><input type="text" name="LugarTrabajoMadre_Actualizado" value="<%= ficha.LugarTrabajoMadre || '' %>"></div>
+                        <div class="form-group"><label>Tel. Personal</label><input type="tel" name="TelefonoPersonalMadre_Actualizado" value="<%= ficha.TelefonoPersonalMadre || '' %>" placeholder="XXXX-XXXX" maxlength="9"></div>
+                        <div class="form-group"><label>Tel. Trabajo</label><input type="tel" name="TelefonoTrabajoMadre_Actualizado" value="<%= ficha.TelefonoTrabajoMadre || '' %>" placeholder="XXXX-XXXX" maxlength="9"></div>
+                        <div class="form-group"><label>Email</label><input type="email" name="EmailMadre_Actualizado" value="<%= ficha.EmailMadre || '' %>"></div>
+                    </div>
+
+                    <hr style="margin: 20px 0; border: 1px solid #f0f0f0;">
+                    
+                    <h3 style="color: var(--primary-dark); margin-bottom: 15px;">Datos del Responsable Principal (Tutor)</h3>
+                    <div class="form-grid">
+                        <div class="form-group"><label for="primer_nombre_responsable" class="required">Primer Nombre</label><input type="text" id="primer_nombre_responsable" name="PRIMER_NOMBRE_RESPONSABLE_Actualizado" value="<%= ficha.PRIMER_NOMBRE_RESPONSABLE %>" required></div>
+                        <div class="form-group"><label for="segundo_nombre_responsable">Segundo Nombre</label><input type="text" id="segundo_nombre_responsable" name="SEGUNDO_NOMBRE_RESPONSABLE_Actualizado" value="<%= ficha.SEGUNDO_NOMBRE_RESPONSABLE || '' %>"></div>
+                        <div class="form-group"><label for="primer_apellido_responsable" class="required">Primer Apellido</label><input type="text" id="primer_apellido_responsable" name="PRIMER_APELLIDO_RESPONSABLE_Actualizado" value="<%= ficha.PRIMER_APELLIDO_RESPONSABLE %>" required></div>
+                        <div class="form-group"><label for="segundo_apellido_responsable">Segundo Apellido</label><input type="text" id="segundo_apellido_responsable" name="SEGUNDO_APELLIDO_RESPONSABLE_Actualizado" value="<%= ficha.SEGUNDO_APELLIDO_RESPONSABLE || '' %>"></div>
+                        <div class="form-group"><label for="fecha_nacimiento_responsable" class="required">Fecha Nacimiento</label><input type="date" id="fecha_nacimiento_responsable" name="FECHA_NACIMIENTO_RESPONSABLE_Actualizado" value="<%= ficha.FECHA_NACIMIENTO_RESPONSABLE ? new Date(ficha.FECHA_NACIMIENTO_RESPONSABLE).toISOString().split('T')[0] : '' %>" required></div>
+                        <div class="form-group"><label for="nacionalidad_responsable" class="required">Nacionalidad</label><input type="text" id="nacionalidad_responsable" name="NACIONALIDAD_RESPONSABLE_Actualizado" value="<%= ficha.NACIONALIDAD_RESPONSABLE %>" required></div>
+                        <div class="form-group"><label for="tipo_documento" class="required">Tipo Documento</label><select id="tipo_documento" name="TIPO_DOCUMENTO_Actualizado" required><option value="CEDULA" <%= (ficha.TIPO_DOCUMENTO == 'CEDULA') ? 'selected' : '' %>>Cédula</option><option value="PASAPORTE" <%= (ficha.TIPO_DOCUMENTO == 'PASAPORTE') ? 'selected' : '' %>>Pasaporte</option><option value="DNI" <%= (ficha.TIPO_DOCUMENTO == 'DNI') ? 'selected' : '' %>>DNI</option></select></div>
+                        <div class="form-group">
+                            <label for="numero_documento" class="required">Número Documento</label>
+                            <input type="text" id="numero_documento" name="NUMERO_DOCUMENTO_Actualizado" value="<%= ficha.NUMERO_DOCUMENTO %>" required placeholder="XXX-XXXXXX-XXXXL" maxlength="16">
+                        </div>
+                        <div class="form-group">
+                            <label for="celular" class="required">Celular (Contacto Principal)</label>
+                            <input type="tel" id="celular" name="CELULAR_Actualizado" value="<%= ficha.CELULAR %>" required placeholder="XXXX-XXXX" maxlength="9">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ... (Sección C - Emergencia) ... -->
+                <div class="form-section">
+                    <h2 class="section-title">C - Información Adicional y de Emergencia</h2>
+                    <div class="form-grid">
+                        <div class="form-group"><label>En caso de emergencia llamar a (Nombre 1)</label><input type="text" name="EmergenciaNombre1_Actualizado" value="<%= ficha.EmergenciaNombre1 || '' %>"></div>
+                        <div class="form-group"><label>Teléfono (Emergencia 1)</label><input type="tel" name="EmergenciaTelefono1_Actualizado" value="<%= ficha.EmergenciaTelefono1 || '' %>" placeholder="XXXX-XXXX" maxlength="9"></div>
+                        <div class="form-group"><label>En caso de emergencia llamar a (Nombre 2)</label><input type="text" name="EmergenciaNombre2_Actualizado" value="<%= ficha.EmergenciaNombre2 || '' %>"></div>
+                        <div class="form-group"><label>Teléfono (Emergencia 2)</label><input type="tel" name="EmergenciaTelefono2_Actualizado" value="<%= ficha.EmergenciaTelefono2 || '' %>" placeholder="XXXX-XXXX" maxlength="9"></div>
+                        <div class="form-group" style="grid-column: 1 / -1;"><label for="HERMANOS_COLEGIO">Hermanos en el Colegio (Nombres y Grados)</label><textarea id="HERMANOS_COLEGIO" name="HERMANOS_COLEGIO_Actualizado" rows="3"><%= ficha.HERMANOS_COLEGIO || '' %></textarea></div>
+                        <div class="form-group" style="grid-column: 1 / -1;"><label for="OBSERVACION">Observaciones (Alergias, etc.)</label><textarea id="OBSERVACION" name="OBSERVACION_Actualizado" rows="4"><%= ficha.OBSERVACION || '' %></textarea></div>
+                    </div>
+                </div>
+
+                <!-- ... (Sección D - Compromiso) ... -->
+                <div class="form-section">
+                    <h2 class="section-title">D - Compromiso de Matrícula</h2>
+                    <div style="padding: 15px; background: #f8f9fa; border-radius: 8px; max-height: 250px; overflow-y: auto; font-size: 0.9rem; line-height: 1.5; color: #333;">
+                        <p><strong>Al matricular a su hijo/a en este Centro de estudios usted se compromete obligatoriamente a:</strong></p>
+                        <ul>
+                            <li>Conocer la Propuesta Educativa Teresiana.</li>
+                            <li>Permitir que su hijo/a participe en actos y celebraciones que se promuevan como parte de su formación integral.</li>
+                            <li>Asistir a todas las entrevistas y reuniones que se convoquen desde las distintas instancias del Centro.</li>
+                            <li>Participar en las diversas actividades que se proponen para los padres y madres de familia.</li>
+                            <li>Llevar al día el pago de mensualidades y comunicar su retiro con una semana de anticipación.</li>
+                            <li>Al firmar esta hoja de matrícula usted autoriza la toma de fotografías en las que aparezca su hijo/a y que serán usadas por la institución en sus páginas oficiales.</li>
+                        </ul>
+                    </div>
+                    <div style="margin-top: 15px;">
+                        <input type="checkbox" id="compromiso" name="compromiso" required>
+                        <label for="compromiso" style="display: inline; font-weight: bold; color: var(--danger);">Sí, he leído y acepto el compromiso de matrícula.</label>
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-check"></i> Confirmar y Enviar Matrícula
+                    </button>
+                    <a href="/estudiantes" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ----- INICIO SCRIPT DE VALIDACIÓN ----- -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            // --- Función para formatear Cédula: XXX-XXXXXX-XXXXL ---
+            function formatCedula(input) {
+                let val = input.value.replace(/[^a-zA-Z0-9]/g, ''); // Limpiar
+                let formatted = '';
+
+                if (val.length > 0) {
+                    formatted = val.substring(0, 3);
+                }
+                if (val.length > 3) {
+                    formatted += '-' + val.substring(3, 9);
+                }
+                if (val.length > 9) {
+                    formatted += '-' + val.substring(9, 13);
+                }
+                if (val.length > 13) {
+                    formatted += val.substring(13, 14).toUpperCase();
+                }
+                
+                input.value = formatted;
+            }
+
+            // --- Función para formatear Teléfono: XXXX-XXXX ---
+            function formatTelefono(input) {
+                let val = input.value.replace(/\D/g, ''); // Solo dígitos
+                if (val.length > 4) {
+                    val = val.substring(0, 4) + '-' + val.substring(4, 8);
+                }
+                input.value = val;
+            }
+
+            // --- Event Listener Global (Delegación de eventos) ---
+            document.body.addEventListener('input', function(e) {
+                const target = e.target;
+                
+                // 1. Formatear Cédulas
+                if (target.matches('input[name*="Cedula"], input[name*="NUMERO_DOCUMENTO"]')) {
+                    formatCedula(target);
+                }
+                // 2. Formatear Teléfonos
+                else if (target.matches('input[type="tel"]')) {
+                    formatTelefono(target);
+                }
+                // 3. Forzar MAYÚSCULAS (excepto en emails)
+                else if (target.matches('input[type="text"], textarea') && !target.matches('input[type="email"]')) {
+                    // Excepción para el código de estudiante que puede tener minúsculas
+                    if (target.id !== 'codigo_estudiante') {
+                         target.value = target.value.toUpperCase();
+                    }
+                }
+                // 4. Forzar minúsculas en emails
+                else if (target.matches('input[type="email"]')) {
+                    target.value = target.value.toLowerCase();
+                }
+            });
+        });
+    </script>
+    <!-- ----- FIN SCRIPT DE VALIDACIÓN ----- -->
+</body>
+</html>

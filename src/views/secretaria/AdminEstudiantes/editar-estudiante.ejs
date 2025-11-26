@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Editar Estudiante</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="/styles/form.css">
+</head>
+
+<style>
+  /* Agregar soporte para emails y la clase form-control */
+  .form-group input[type="email"],
+  .form-control {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .form-group input[type="email"]:focus,
+  .form-control:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(3, 130, 172, 0.15);
+  }
+</style>
+
+<body>
+  <div class="form-page-container">
+    <div class="form-header">
+      <h1><i class="fas fa-user-edit"></i> Editar Estudiante</h1>
+      <p>Modifique la información biográfica y la ficha de matrícula activa del estudiante.</p>
+    </div>
+
+    <div class="form-content">
+
+      <% if (typeof error !=='undefined' && error) { %>
+        <div class="alert alert-danger">
+          <i class="fas fa-exclamation-triangle"></i>
+          <strong>Error al actualizar:</strong>
+          <%= error %>
+        </div>
+        <% } %>
+          <% if (typeof success !=='undefined' && success) { %>
+            <div class="alert alert-success">
+              <i class="fas fa-check-circle"></i>
+              <%= success %>
+            </div>
+            <% } %>
+
+              <form id="estudianteForm" method="POST"
+                action="/secretaria/editar-estudiante/<%= estudiante.id_estudiante %>">
+
+                <div class="form-section">
+                  <h2 class="section-title">🏫 Información Académica y de Sistema</h2>
+                  <div class="form-grid">
+
+                    <div class="form-group">
+                      <label for="grado" class="required">Grado a Inscribir</label>
+                      <select id="grado" name="grado" required class="form-control">
+                        <% grados.forEach(grado=> { %>
+                          <option value="<%= grado.NombreGrado %>" <%=(grado.NombreGrado==estudiante.NombreGrado)
+                            ? 'selected' : '' %>>
+                            <%= grado.NombreGrado %>
+                          </option>
+                          <% }); %>
+                      </select>
+                    </div>
+
+                    <div class="form-group">
+                      <label for="seccion" class="required">Sección a Inscribir</label>
+                      <select id="seccion" name="seccion" required class="form-control">
+                        <% secciones.forEach(seccion=> { %>
+                          <option value="<%= seccion.NombreSeccion %>"
+                            <%=(seccion.NombreSeccion==estudiante.NombreSeccion) ? 'selected' : '' %>>
+                            <%= seccion.NombreSeccion %>
+                          </option>
+                          <% }); %>
+                      </select>
+                    </div>
+
+                    <div class="form-group">
+                      <label for="codigo_estudiante" class="required">Código de Estudiante</label>
+                      <input type="text" id="codigo_estudiante" name="codigo_estudiante" required
+                        value="<%= estudiante.CODIGO_ESTUDIANTE %>" class="form-control">
+                    </div>
+
+                    <div class="form-group">
+                      <label for="ID_Estado_Estudiante" class="required">Estado del Estudiante</label>
+                      <select id="ID_Estado_Estudiante" name="ID_Estado_Estudiante" required class="form-control">
+                        <% estados.forEach(estado=> { %>
+                          <option value="<%= estado.ID_Estado_Estudiante %>"
+                            <%=(estado.ID_Estado_Estudiante==estudiante.ID_Estado_Estudiante) ? 'selected' : '' %>>
+                            <%= estado.NombreEstado %>
+                          </option>
+                          <% }); %>
+                      </select>
+                    </div>
+
+                    <div class="form-group" style="grid-column: 1 / -1;">
+                      <label for="ID_Usuario">Cuenta de Usuario (Login del Estudiante):</label>
+                      <select id="ID_Usuario" name="ID_Usuario" class="form-control">
+                        <option value="">-- Sin cuenta de login --</option>
+                        <% usuarios.forEach(u=> { %>
+                          <option value="<%= u.ID_Usuario %>" <%=(estudiante.ID_Usuario==u.ID_Usuario) ? 'selected' : ''
+                            %>>
+                            <%= u.Email %> (<%= u.NombreRol %>)
+                          </option>
+                          <% }); %>
+                      </select>
+                      <small class="form-hint" style="margin-top: 5px; color: #666;">
+                        Selecciona el email de Google con el que este estudiante iniciará sesión. Solo aparecen usuarios
+                        con rol 'ESTUDIANTES' o 'PENDIENTE'.
+                      </small>
+                    </div>
+
+                  </div>
+                </div>
+
+                <div class="form-section">
+                  <h2 class="section-title">👤 Información Personal (Biográfica)</h2>
+                  <div class="form-grid">
+                    <div class="form-group"><label for="primer_nombre" class="required">Primer Nombre</label><input
+                        type="text" id="primer_nombre" name="primer_nombre" required
+                        value="<%= estudiante.PRIMER_NOMBRE %>" class="form-control"></div>
+                    <div class="form-group"><label for="segundo_nombre">Segundo Nombre</label><input type="text"
+                        id="segundo_nombre" name="segundo_nombre" value="<%= estudiante.SEGUNDO_NOMBRE || '' %>"
+                        class="form-control"></div>
+                    <div class="form-group"><label for="primer_apellido" class="required">Primer Apellido</label><input
+                        type="text" id="primer_apellido" name="primer_apellido" required
+                        value="<%= estudiante.PRIMER_APELLIDO %>" class="form-control"></div>
+                    <div class="form-group"><label for="segundo_apellido">Segundo Apellido</label><input type="text"
+                        id="segundo_apellido" name="segundo_apellido" value="<%= estudiante.SEGUNDO_APELLIDO || '' %>"
+                        class="form-control"></div>
+                    <div class="form-group"><label for="fecha_nacimiento" class="required">Fecha de
+                        Nacimiento</label><input type="date" id="fecha_nacimiento" name="fecha_nacimiento" required
+                        value="<%= estudiante.FECHA_NACIMIENTO ? new Date(estudiante.FECHA_NACIMIENTO).toISOString().split('T')[0] : '' %>"
+                        class="form-control"></div>
+                    <div class="form-group">
+                      <label for="sexo" class="required">Sexo</label>
+                      <select id="sexo" name="sexo" required class="form-control">
+                        <option value="">Seleccione</option>
+                        <option value="M" <%=(estudiante.SEXO=='M' ) ? 'selected' : '' %>>Masculino</option>
+                        <option value="F" <%=(estudiante.SEXO=='F' ) ? 'selected' : '' %>>Femenino</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-section">
+                  <h2 class="section-title">📄 Datos de la Ficha Activa (ID: <%= estudiante.ID_Ficha_Activa %>)</h2>
+                  <p style="margin-bottom: 20px; color: var(--gray);">Esta es la información de contacto y familiar más
+                    reciente del estudiante.</p>
+
+                  <div class="form-grid">
+                    <div class="form-group"><label for="LugarNacimiento">Lugar de Nacimiento</label><input type="text"
+                        id="LugarNacimiento" name="LugarNacimiento" value="<%= ficha.LugarNacimiento || '' %>"
+                        class="form-control"></div>
+                    <div class="form-group"><label for="RELIGION" class="required">Religión</label><select id="RELIGION"
+                        name="RELIGION" required class="form-control">
+                        <option value="CATÓLICO" <%=(ficha.RELIGION=='CATÓLICO' ) ? 'selected' : '' %>>Católico</option>
+                        <option value="EVANGÉLICO" <%=(ficha.RELIGION=='EVANGÉLICO' ) ? 'selected' : '' %>>Evangélico
+                        </option>
+                        <option value="CRISTIANO" <%=(ficha.RELIGION=='CRISTIANO' ) ? 'selected' : '' %>>Cristiano
+                        </option>
+                        <option value="OTRA" <%=(ficha.RELIGION=='OTRA' ) ? 'selected' : '' %>>Otra</option>
+                        <option value="NINGUNA" <%=(ficha.RELIGION=='NINGUNA' ) ? 'selected' : '' %>>Ninguna</option>
+                      </select></div>
+                    <div class="form-group"><label for="ConQuienVive">¿Con quién vive?</label><select id="ConQuienVive"
+                        name="ConQuienVive" class="form-control">
+                        <option value="">Seleccione</option>
+                        <option value="PADRE Y MADRE" <%=(ficha.ConQuienVive=='PADRE Y MADRE' ) ? 'selected' : '' %>
+                          >Padre y Madre</option>
+                        <option value="PADRE" <%=(ficha.ConQuienVive=='PADRE' ) ? 'selected' : '' %>>Solo Padre</option>
+                        <option value="MADRE" <%=(ficha.ConQuienVive=='MADRE' ) ? 'selected' : '' %>>Solo Madre</option>
+                        <option value="TUTOR" <%=(ficha.ConQuienVive=='TUTOR' ) ? 'selected' : '' %>>Tutor</option>
+                      </select></div>
+                    <div class="form-group"><label for="ParentescoTutor">Si es Tutor, ¿parentesco?</label><input
+                        type="text" id="ParentescoTutor" name="ParentescoTutor"
+                        value="<%= ficha.ParentescoTutor || '' %>" class="form-control"></div>
+                    <div class="form-group" style="grid-column: 1 / -1;"><label for="DIAGNOSTICO_SALUD">Padecimiento o
+                        Diagnóstico</label><input type="text" id="DIAGNOSTICO_SALUD" name="DIAGNOSTICO_SALUD"
+                        value="<%= ficha.DIAGNOSTICO_SALUD || 'NINGUNO' %>" class="form-control"></div>
+                    <div class="form-group" style="grid-column: 1 / -1;"><label for="DOMICILIO"
+                        class="required">Dirección Domiciliar</label><textarea id="DOMICILIO" name="DOMICILIO" required
+                        rows="3" class="form-control"><%= ficha.DOMICILIO %></textarea></div>
+                  </div>
+                </div>
+
+                <div class="form-section">
+                  <h2 class="section-title">B - Datos Familiares (Ficha Activa)</h2>
+
+                  <h3
+                    style="color: var(--primary-dark); margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 5px;">
+                    Datos del Padre</h3>
+                  <div class="form-grid">
+                    <div class="form-group"><label>Nombre Padre</label><input type="text" name="NombrePadre"
+                        value="<%= ficha.NombrePadre || '' %>" class="form-control"></div>
+                    <div class="form-group"><label>Cédula Padre</label><input type="text" name="CedulaPadre"
+                        value="<%= ficha.CedulaPadre || '' %>" placeholder="XXX-XXXXXX-XXXXL" maxlength="16"
+                        class="form-control"></div>
+                    <div class="form-group"><label>Nivel Académico</label><input type="text" name="NivelAcademicoPadre"
+                        value="<%= ficha.NivelAcademicoPadre || '' %>" class="form-control"></div>
+                    <div class="form-group"><label>Profesión</label><input type="text" name="ProfesionPadre"
+                        value="<%= ficha.ProfesionPadre || '' %>" class="form-control"></div>
+                    <div class="form-group"><label>Lugar de Trabajo</label><input type="text" name="LugarTrabajoPadre"
+                        value="<%= ficha.LugarTrabajoPadre || '' %>" class="form-control"></div>
+                    <div class="form-group"><label>Tel. Personal</label><input type="tel" name="TelefonoPersonalPadre"
+                        value="<%= ficha.TelefonoPersonalPadre || '' %>" placeholder="XXXX-XXXX" maxlength="9"
+                        class="form-control"></div>
+                    <div class="form-group"><label>Tel. Trabajo</label><input type="tel" name="TelefonoTrabajoPadre"
+                        value="<%= ficha.TelefonoTrabajoPadre || '' %>" placeholder="XXXX-XXXX" maxlength="9"
+                        class="form-control"></div>
+                    <div class="form-group"><label>Email</label><input type="email" name="EmailPadre"
+                        value="<%= ficha.EmailPadre || '' %>" class="form-control"></div>
+                  </div>
+
+                  <h3
+                    style="color: var(--primary-dark); margin: 25px 0 15px 0; border-bottom: 1px solid #eee; padding-bottom: 5px;">
+                    Datos de la Madre</h3>
+                  <div class="form-grid">
+                    <div class="form-group"><label>Nombre Madre</label><input type="text" name="NombreMadre"
+                        value="<%= ficha.NombreMadre || '' %>" class="form-control"></div>
+                    <div class="form-group"><label>Cédula Madre</label><input type="text" name="CedulaMadre"
+                        value="<%= ficha.CedulaMadre || '' %>" placeholder="XXX-XXXXXX-XXXXL" maxlength="16"
+                        class="form-control"></div>
+                    <div class="form-group"><label>Nivel Académico</label><input type="text" name="NivelAcademicoMadre"
+                        value="<%= ficha.NivelAcademicoMadre || '' %>" class="form-control"></div>
+                    <div class="form-group"><label>Profesión</label><input type="text" name="ProfesionMadre"
+                        value="<%= ficha.ProfesionMadre || '' %>" class="form-control"></div>
+                    <div class="form-group"><label>Lugar de Trabajo</label><input type="text" name="LugarTrabajoMadre"
+                        value="<%= ficha.LugarTrabajoMadre || '' %>" class="form-control"></div>
+                    <div class="form-group"><label>Tel. Personal</label><input type="tel" name="TelefonoPersonalMadre"
+                        value="<%= ficha.TelefonoPersonalMadre || '' %>" placeholder="XXXX-XXXX" maxlength="9"
+                        class="form-control"></div>
+                    <div class="form-group"><label>Tel. Trabajo</label><input type="tel" name="TelefonoTrabajoMadre"
+                        value="<%= ficha.TelefonoTrabajoMadre || '' %>" placeholder="XXXX-XXXX" maxlength="9"
+                        class="form-control"></div>
+                    <div class="form-group"><label>Email</label><input type="email" name="EmailMadre"
+                        value="<%= ficha.EmailMadre || '' %>" class="form-control"></div>
+                  </div>
+
+                  <h3
+                    style="color: var(--primary-dark); margin: 25px 0 15px 0; border-bottom: 1px solid #eee; padding-bottom: 5px;">
+                    Datos del Responsable Principal (Tutor)</h3>
+                  <div class="form-grid">
+                    <div class="form-group"><label for="primer_nombre_responsable" class="required">Primer
+                        Nombre</label><input type="text" id="primer_nombre_responsable" name="PRIMER_NOMBRE_RESPONSABLE"
+                        required value="<%= ficha.PRIMER_NOMBRE_RESPONSABLE %>" class="form-control"></div>
+                    <div class="form-group"><label for="segundo_nombre_responsable">Segundo Nombre</label><input
+                        type="text" id="segundo_nombre_responsable" name="SEGUNDO_NOMBRE_RESPONSABLE"
+                        value="<%= ficha.SEGUNDO_NOMBRE_RESPONSABLE || '' %>" class="form-control"></div>
+                    <div class="form-group"><label for="primer_apellido_responsable" class="required">Primer
+                        Apellido</label><input type="text" id="primer_apellido_responsable"
+                        name="PRIMER_APELLIDO_RESPONSABLE" required value="<%= ficha.PRIMER_APELLIDO_RESPONSABLE %>"
+                        class="form-control"></div>
+                    <div class="form-group"><label for="segundo_apellido_responsable">Segundo Apellido</label><input
+                        type="text" id="segundo_apellido_responsable" name="SEGUNDO_APELLIDO_RESPONSABLE"
+                        value="<%= ficha.SEGUNDO_APELLIDO_RESPONSABLE || '' %>" class="form-control"></div>
+                    <div class="form-group"><label for="fecha_nacimiento_responsable" class="required">Fecha
+                        Nacimiento</label><input type="date" id="fecha_nacimiento_responsable"
+                        name="FECHA_NACIMIENTO_RESPONSABLE" required
+                        value="<%= ficha.FECHA_NACIMIENTO_RESPONSABLE ? new Date(ficha.FECHA_NACIMIENTO_RESPONSABLE).toISOString().split('T')[0] : '' %>"
+                        class="form-control"></div>
+                    <div class="form-group"><label for="nacionalidad_responsable"
+                        class="required">Nacionalidad</label><input type="text" id="nacionalidad_responsable"
+                        name="NACIONALIDAD_RESPONSABLE" required value="<%= ficha.NACIONALIDAD_RESPONSABLE %>"
+                        class="form-control"></div>
+                    <div class="form-group"><label for="tipo_documento" class="required">Tipo Documento</label><select
+                        id="tipo_documento" name="TIPO_DOCUMENTO" required class="form-control">
+                        <option value="CEDULA" <%=(ficha.TIPO_DOCUMENTO=='CEDULA' ) ? 'selected' : '' %>>Cédula</option>
+                        <option value="PASAPORTE" <%=(ficha.TIPO_DOCUMENTO=='PASAPORTE' ) ? 'selected' : '' %>>Pasaporte
+                        </option>
+                        <option value="DNI" <%=(ficha.TIPO_DOCUMENTO=='DNI' ) ? 'selected' : '' %>>DNI</option>
+                      </select></div>
+                    <div class="form-group">
+                      <label for="numero_documento" class="required">Número Documento</label>
+                      <input type="text" id="numero_documento" name="NUMERO_DOCUMENTO" required
+                        value="<%= ficha.NUMERO_DOCUMENTO %>" placeholder="XXX-XXXXXX-XXXXL" maxlength="16"
+                        class="form-control">
+                    </div>
+                    <div class="form-group">
+                      <label for="celular" class="required">Celular (Contacto Principal)</label>
+                      <input type="tel" id="celular" name="CELULAR" required value="<%= ficha.CELULAR %>"
+                        placeholder="XXXX-XXXX" maxlength="9" class="form-control">
+                    </div>
+                  </div>
+                </div>
+
+                <div class="btn-group">
+                  <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Guardar Cambios
+                  </button>
+                  <a href="/secretaria" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Cancelar
+                  </a>
+                </div>
+              </form>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+      function formatCedula(input) {
+        let val = input.value.replace(/[^a-zA-Z0-9]/g, '');
+        let formatted = '';
+        if (val.length > 0) formatted = val.substring(0, 3);
+        if (val.length > 3) formatted += '-' + val.substring(3, 9);
+        if (val.length > 9) formatted += '-' + val.substring(9, 13);
+        if (val.length > 13) formatted += val.substring(13, 14).toUpperCase();
+        input.value = formatted;
+      }
+
+      function formatTelefono(input) {
+        let val = input.value.replace(/\D/g, '');
+        if (val.length > 4) val = val.substring(0, 4) + '-' + val.substring(4, 8);
+        input.value = val;
+      }
+
+      document.body.addEventListener('input', function (e) {
+        const target = e.target;
+
+        if (target.matches('input[name*="Cedula"], input[name*="NUMERO_DOCUMENTO"]')) {
+          formatCedula(target);
+        } else if (target.matches('input[type="tel"]')) {
+          formatTelefono(target);
+        } else if (target.matches('input[type="text"], textarea') && !target.matches('input[type="email"]')) {
+          if (target.id !== 'codigo_estudiante') {
+            target.value = target.value.toUpperCase();
+          }
+        } else if (target.matches('input[type="email"]')) {
+          target.value = target.value.toLowerCase();
+        }
+      });
+    });
+  </script>
+</body>
+
+</html>

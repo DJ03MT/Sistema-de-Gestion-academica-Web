@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Panel de Profesor</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/styles/menuprofesores.css">
+    <style>
+        /* Estilos específicos para la cuadrícula de cursos */
+        .courses-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .course-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-left: 6px solid var(--primary);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .course-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Parte superior de la tarjeta (Clickeable) */
+        .course-info-link {
+            padding: 25px 25px 15px 25px;
+            text-decoration: none;
+            color: inherit;
+            flex-grow: 1;
+        }
+
+        .course-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 10px;
+        }
+
+        .course-meta {
+            color: var(--gray);
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 5px;
+        }
+
+        .course-badge {
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-top: 15px;
+            display: inline-block;
+        }
+
+        /* Sección de Botones de Acción */
+        .course-actions {
+            display: flex;
+            border-top: 1px solid #f0f0f0;
+            background: #fcfcfc;
+        }
+
+        .action-btn {
+            flex: 1;
+            text-align: center;
+            padding: 12px 0;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .action-btn.notas {
+            color: #1976d2;
+            /* Azul */
+            border-right: 1px solid #f0f0f0;
+        }
+
+        .action-btn.notas:hover {
+            background: #e3f2fd;
+        }
+
+        .action-btn.asistencia {
+            color: #2ecc71;
+            /* Verde */
+        }
+
+        .action-btn.asistencia:hover {
+            background: #e8f5e9;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <div class="sidebar">
+            <div class="user-profile">
+                <div class="avatar">
+                    <img src="<%= user.photo || '/img/default-user.png' %>" alt="User" class="user-photo">
+                </div>
+                <div class="user-name">Prof. <%= profesor.PRIMER_NOMBRE %>
+                </div>
+                <div class="user-info">Año Lectivo <%= anio %>
+                </div>
+            </div>
+            <ul class="nav-links">
+                <li>
+                    <a href="/profesores" class="nav-link active">
+                        <i class="fas fa-chalkboard-teacher"></i> Mis Cursos
+                    </a>
+                </li>
+            </ul>
+            <div class="logout-section">
+                <a href="/logout" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                </a>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="content-header">
+                <div>
+                    <h1>Mis Cursos Asignados</h1>
+                    <p>Seleccione una acción (Notas o Asistencia) para gestionar el curso.</p>
+                </div>
+            </div>
+
+            <% if (cursos.length===0) { %>
+                <div style="text-align: center; padding: 40px; color: #666;">
+                    <i class="fas fa-folder-open" style="font-size: 4rem; margin-bottom: 15px; color: #ccc;"></i>
+                    <h3>No tienes cursos asignados para este año.</h3>
+                    <p>Contacta a la dirección académica.</p>
+                </div>
+                <% } else { %>
+                    <div class="courses-grid">
+                        <% cursos.forEach(curso=> { %>
+                            <div class="course-card">
+                                <a href="/profesores/curso/<%= curso.ID_Curso %>" class="course-info-link">
+                                    <div class="course-title">
+                                        <%= curso.NombreAsignatura %>
+                                    </div>
+                                    <div class="course-meta">
+                                        <i class="fas fa-layer-group"></i>
+                                        <%= curso.NombreGrado %>
+                                    </div>
+                                    <div class="course-meta">
+                                        <i class="fas fa-users"></i> Sección "<%= curso.NombreSeccion %>"
+                                    </div>
+                                    <span class="course-badge">
+                                        <%= curso.TotalEstudiantes %> Estudiantes
+                                    </span>
+                                </a>
+
+                                <div class="course-actions">
+                                    <a href="/profesores/curso/<%= curso.ID_Curso %>" class="action-btn notas">
+                                        <i class="fas fa-star"></i> Notas
+                                    </a>
+                                    <a href="/profesores/curso/<%= curso.ID_Curso %>/asistencia"
+                                        class="action-btn asistencia">
+                                        <i class="fas fa-check-circle"></i> Asistencia
+                                    </a>
+                                </div>
+                            </div>
+                            <% }); %>
+                    </div>
+                    <% } %>
+        </div>
+    </div>
+</body>
+
+</html>

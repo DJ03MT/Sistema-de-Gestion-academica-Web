@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Estudiantes</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/styles/form.css">
+</head>
+
+<body>
+    <div class="form-page-container">
+        <div class="form-header">
+            <h1><i class="fas fa-user-plus"></i> Sistema de Registro de Estudiantes</h1>
+            <p>Complete toda la información requerida para el registro académico</p>
+        </div>
+
+        <div class="form-content">
+            <div id="js-error-container" style="display: none;"></div>
+
+            <% if (typeof error !=='undefined' && error) { %>
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <strong>Error al guardar:</strong>
+                    <%= error %>
+                </div>
+                <% } %>
+
+                    <form id="estudianteForm" method="POST" action="/secretaria/estudiantes" novalidate>
+
+                        <div class="form-section">
+                            <h2 class="section-title">🏫 Información Académica</h2>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="grado" class="required">Grado a Inscribir</label>
+                                    <select id="grado" name="grado" required>
+                                        <option value="">Seleccione el grado</option>
+                                        <% grados.forEach(grado=> { %>
+                                            <option value="<%= grado.NombreGrado %>">
+                                                <%= grado.NombreGrado %>
+                                            </option>
+                                            <% }); %>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="seccion" class="required">Sección a Inscribir</label>
+                                    <select id="seccion" name="seccion" required>
+                                        <option value="">Seleccione la sección</option>
+                                        <% secciones.forEach(seccion=> { %>
+                                            <option value="<%= seccion.NombreSeccion %>">
+                                                <%= seccion.NombreSeccion %>
+                                            </option>
+                                            <% }); %>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="codigo_estudiante" class="required">Código de Estudiante</label>
+                                    <input type="text" id="codigo_estudiante" name="codigo_estudiante" required
+                                        placeholder="Ej: APELLIDO-NOMBRE-AÑO" style="text-transform: uppercase;">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <h2 class="section-title">👤 Información Personal del Estudiante</h2>
+                            <div class="form-grid">
+                                <div class="form-group"><label for="primer_nombre" class="required">Primer
+                                        Nombre</label><input type="text" id="primer_nombre" name="primer_nombre"
+                                        class="text-only" required></div>
+                                <div class="form-group"><label for="segundo_nombre">Segundo Nombre</label><input
+                                        type="text" id="segundo_nombre" name="segundo_nombre" class="text-only"></div>
+                                <div class="form-group"><label for="primer_apellido" class="required">Primer
+                                        Apellido</label><input type="text" id="primer_apellido" name="primer_apellido"
+                                        class="text-only" required></div>
+                                <div class="form-group"><label for="segundo_apellido">Segundo Apellido</label><input
+                                        type="text" id="segundo_apellido" name="segundo_apellido" class="text-only">
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="fecha_nacimiento" class="required">Fecha de Nacimiento</label>
+                                    <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" required>
+                                </div>
+
+                                <div class="form-group"><label for="LugarNacimiento">Lugar de Nacimiento</label><input
+                                        type="text" id="LugarNacimiento" name="LugarNacimiento" class="text-only"></div>
+
+                                <div class="form-group">
+                                    <label for="sexo" class="required">Sexo</label>
+                                    <select id="sexo" name="sexo" required>
+                                        <option value="">Seleccione</option>
+                                        <option value="M">Masculino</option>
+                                        <option value="F">Femenino</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <h2 class="section-title">🏥 Información de Salud y Domicilio</h2>
+                            <div class="form-grid">
+                                <div class="form-group" style="grid-column: 1 / -1;"><label
+                                        for="DIAGNOSTICO_SALUD">Padecimiento o Diagnóstico</label><input type="text"
+                                        id="DIAGNOSTICO_SALUD" name="DIAGNOSTICO_SALUD" value="NINGUNO"></div>
+                                <div class="form-group" style="grid-column: 1 / -1;"><label for="DOMICILIO"
+                                        class="required">Domicilio Completo</label><textarea id="DOMICILIO"
+                                        name="DOMICILIO" required rows="3"></textarea></div>
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <h2 class="section-title">👨‍👩‍👧‍👦 Información del Responsable</h2>
+                            <div class="form-grid">
+                                <div class="form-group"><label for="primer_nombre_responsable" class="required">Primer
+                                        Nombre</label><input type="text" id="primer_nombre_responsable"
+                                        name="PRIMER_NOMBRE_RESPONSABLE" class="text-only" required></div>
+                                <div class="form-group"><label for="segundo_nombre_responsable">Segundo
+                                        Nombre</label><input type="text" id="segundo_nombre_responsable"
+                                        name="SEGUNDO_NOMBRE_RESPONSABLE" class="text-only"></div>
+                                <div class="form-group"><label for="primer_apellido_responsable" class="required">Primer
+                                        Apellido</label><input type="text" id="primer_apellido_responsable"
+                                        name="PRIMER_APELLIDO_RESPONSABLE" class="text-only" required></div>
+                                <div class="form-group"><label for="segundo_apellido_responsable">Segundo
+                                        Apellido</label><input type="text" id="segundo_apellido_responsable"
+                                        name="SEGUNDO_APELLIDO_RESPONSABLE" class="text-only"></div>
+
+                                <div class="form-group"><label for="fecha_nacimiento_responsable" class="required">Fecha
+                                        de Nacimiento</label><input type="date" id="fecha_nacimiento_responsable"
+                                        name="FECHA_NACIMIENTO_RESPONSABLE" required></div>
+
+                                <div class="form-group"><label for="nacionalidad_responsable"
+                                        class="required">Nacionalidad</label><input type="text"
+                                        id="nacionalidad_responsable" name="NACIONALIDAD_RESPONSABLE" class="text-only"
+                                        required value="NICARAGUENSE"></div>
+
+                                <div class="form-group">
+                                    <label for="tipo_documento" class="required">Tipo de Documento</label>
+                                    <select id="tipo_documento" name="TIPO_DOCUMENTO" required>
+                                        <option value="">Seleccione</option>
+                                        <option value="CEDULA">Cédula</option>
+                                        <option value="PASAPORTE">Pasaporte</option>
+                                        <option value="DNI">DNI</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="numero_documento" class="required">Número del Documento</label>
+                                    <input type="text" id="numero_documento" name="NUMERO_DOCUMENTO" required
+                                        placeholder="XXX-XXXXXX-XXXXL" maxlength="16"
+                                        style="text-transform: uppercase;">
+                                </div>
+                                <div class="form-group">
+                                    <label for="celular" class="required">Celular</label>
+                                    <input type="tel" id="celular" name="CELULAR" required placeholder="XXXX-XXXX"
+                                        maxlength="9">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <h2 class="section-title">📋 Información Adicional</h2>
+                            <div class="form-grid">
+                                <div class="form-group" style="grid-column: 1 / -1;"><label
+                                        for="HERMANOS_COLEGIO">Hermanos en el Colegio</label><textarea
+                                        id="HERMANOS_COLEGIO" name="HERMANOS_COLEGIO" rows="3"
+                                        placeholder="Ej: ABISAI GONZALEZ 2DO GRADO"></textarea></div>
+                                <div class="form-group">
+                                    <label for="RELIGION" class="required">Religión</label>
+                                    <select id="RELIGION" name="RELIGION" required>
+                                        <option value="">Seleccione</option>
+                                        <option value="CATÓLICO">Católico</option>
+                                        <option value="EVANGÉLICO">Evangélico</option>
+                                        <option value="CRISTIANO">Cristiano</option>
+                                        <option value="OTRA">Otra</option>
+                                        <option value="NINGUNA">Ninguna</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="grid-column: 1 / -1;"><label
+                                        for="OBSERVACION">Observaciones</label><textarea id="OBSERVACION"
+                                        name="OBSERVACION" rows="4"></textarea></div>
+                            </div>
+                        </div>
+
+                        <div class="btn-group">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Guardar Estudiante
+                            </button>
+                            <a href="/secretaria" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Cancelar
+                            </a>
+                        </div>
+                    </form>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+
+            // Variables
+            const today = new Date().toISOString().split('T')[0];
+            const tipoDocSelect = document.getElementById('tipo_documento');
+            const numDocInput = document.getElementById('numero_documento');
+            const fechaNacInput = document.getElementById('fecha_nacimiento');
+            const fechaRespInput = document.getElementById('fecha_nacimiento_responsable');
+
+            // 1. Configurar fechas máximas
+            if (fechaNacInput) fechaNacInput.setAttribute('max', today);
+            if (fechaRespInput) fechaRespInput.setAttribute('max', today);
+
+            // 2. Funciones de Formato
+            function formatCedula(input) {
+                let val = input.value.replace(/[^a-zA-Z0-9]/g, '');
+                let formatted = '';
+                if (val.length > 0) formatted = val.substring(0, 3);
+                if (val.length > 3) formatted += '-' + val.substring(3, 9);
+                if (val.length > 9) formatted += '-' + val.substring(9, 13);
+                if (val.length > 13) formatted += val.substring(13, 14).toUpperCase();
+                input.value = formatted;
+            }
+
+            function formatTelefono(input) {
+                let val = input.value.replace(/\D/g, '');
+                if (val.length > 4) val = val.substring(0, 4) + '-' + val.substring(4, 8);
+                input.value = val;
+            }
+
+            // 3. Cambiar comportamiento según Tipo de Documento
+            if (tipoDocSelect && numDocInput) {
+                tipoDocSelect.addEventListener('change', function () {
+                    // Limpiar campo para evitar formatos mezclados
+                    numDocInput.value = '';
+
+                    if (this.value === 'CEDULA') {
+                        numDocInput.placeholder = 'XXX-XXXXXX-XXXXL';
+                        numDocInput.maxLength = 16; // 14 caracteres + 2 guiones
+                    } else if (this.value === 'PASAPORTE') {
+                        numDocInput.placeholder = 'Número de Pasaporte';
+                        numDocInput.maxLength = 20; // Longitud segura
+                    } else {
+                        numDocInput.placeholder = 'Número de Documento';
+                        numDocInput.maxLength = 20;
+                    }
+                });
+            }
+
+            // 4. Restricción de Entrada (Mientras escribes)
+            document.body.addEventListener('input', function (e) {
+                const target = e.target;
+
+                // Solo Letras
+                if (target.classList.contains('text-only')) {
+                    target.value = target.value.replace(/[0-9]/g, '').toUpperCase();
+                }
+
+                // Lógica Documento de Identidad
+                if (target.id === 'numero_documento') {
+                    const tipo = tipoDocSelect ? tipoDocSelect.value : '';
+
+                    if (tipo === 'CEDULA') {
+                        formatCedula(target);
+                    } else {
+                        // Para Pasaporte/DNI: Permitir letras y números, sin guiones automáticos
+                        target.value = target.value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+                    }
+                }
+                // Si hay otros inputs de cédula hardcodeados (ej: CedulaPadre) siempre formatear como cédula
+                else if (target.matches('input[name*="Cedula"]')) {
+                    formatCedula(target);
+                }
+
+                // Teléfono
+                else if (target.matches('input[type="tel"]')) {
+                    formatTelefono(target);
+                }
+
+                // Código Estudiante
+                else if (target.id === 'codigo_estudiante') {
+                    target.value = target.value.toUpperCase();
+                }
+            });
+
+            // 5. Validación Final al Enviar
+            const form = document.getElementById('estudianteForm');
+            const errorContainer = document.getElementById('js-error-container');
+
+            form.addEventListener('submit', function (e) {
+                let errors = [];
+                const requiredFields = form.querySelectorAll('[required]');
+
+                requiredFields.forEach(field => {
+                    if (!field.value.trim()) {
+                        const label = form.querySelector(`label[for="${field.id}"]`);
+                        const fieldName = label ? label.innerText.replace('*', '').trim() : field.name;
+                        errors.push(`El campo "<strong>${fieldName}</strong>" es obligatorio.`);
+                        field.style.borderColor = "var(--danger)";
+                    } else {
+                        field.style.borderColor = "#ccc";
+                    }
+                });
+
+                if (fechaNacInput && fechaNacInput.value > today) {
+                    errors.push("La fecha de nacimiento del estudiante no puede ser en el futuro.");
+                    fechaNacInput.style.borderColor = "var(--danger)";
+                }
+                if (fechaRespInput && fechaRespInput.value > today) {
+                    errors.push("La fecha de nacimiento del responsable no puede ser en el futuro.");
+                    fechaRespInput.style.borderColor = "var(--danger)";
+                }
+
+                if (errors.length > 0) {
+                    e.preventDefault();
+                    errorContainer.innerHTML = `
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <div>
+                                <strong>Por favor corrija los siguientes errores:</strong>
+                                <ul style="margin-top: 5px; margin-bottom: 0; padding-left: 20px;">
+                                    ${errors.map(err => `<li>${err}</li>`).join('')}
+                                </ul>
+                            </div>
+                        </div>
+                    `;
+                    errorContainer.style.display = 'block';
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                } else {
+                    errorContainer.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

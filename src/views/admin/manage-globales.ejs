@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <title>Gestión de Valores Globales</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/styles/forms.css">
+    <link rel="stylesheet" href="/styles/menusecretaria.css">
+</head>
+<body style="background: var(--light);">
+    <div class="form-page-container" style="max-width: 900px;">
+        <div class="form-header">
+            <h1><i class="fas fa-cogs"></i> Gestión de Valores Globales</h1>
+            <p>Configure los valores que se muestran en todos los paneles.</p>
+        </div>
+        <div class="form-content">
+            
+            <div class="form-section">
+                <h2 class="section-title">Enlace del Calendario</h2>
+                <form method="POST" action="/admin/globales/calendario">
+                    <div class="form-group" style="margin-bottom: 15px;">
+                        <label for="calendario_link">URL del Documento</label>
+                        <input type="url" id="calendario_link" name="calendario_link" class="form-control" value="<%= calendarioLink %>" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Guardar Enlace</button>
+                </form>
+            </div>
+
+            <div class="form-section">
+                <h2 class="section-title">Valores del Mes</h2>
+                <p style="margin-bottom: 15px;">Edite el nombre del valor para cada mes.</p>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Mes</th>
+                                <th>Valor Asignado</th>
+                                <th style="width: 120px;">Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% valores.forEach(v => { %>
+                                <form method="POST" action="/admin/globales/valor/<%= v.ID_ValorMes %>">
+                                    <tr>
+                                        <td><strong><%= v.NombreMes %></strong></td>
+                                        <td>
+                                            <input type="text" name="NombreValor" class="form-control" value="<%= v.NombreValor %>" style="padding: 8px; font-size: 0.9rem;">
+                                        </td>
+                                        <td>
+                                            <button type="submit" class="btn-action btn-edit" style="padding: 8px 12px; width: 100%;">Guardar</button>
+                                        </td>
+                                    </tr>
+                                </form>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="btn-group">
+                <a href="/admin" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Volver al Admin</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
