@@ -1,6 +1,6 @@
 import { getPool, sql } from '../config/database.js';
 
-// --- 1. RENDER DASHBOARD ---
+// RENDER DASHBOARD 
 export const renderDashboardProfesor = async (req, res) => {
     try {
         const pool = await getPool();
@@ -49,7 +49,7 @@ export const renderDashboardProfesor = async (req, res) => {
     }
 };
 
-// --- 2. RENDER SUBIR NOTAS ---
+// RENDER SUBIR NOTAS
 export const renderSubirNotas = async (req, res) => {
     const { idCurso } = req.params;
     const { corte } = req.query;
@@ -94,7 +94,7 @@ export const renderSubirNotas = async (req, res) => {
     }
 };
 
-// --- 3. GUARDAR NOTAS ---
+// GUARDAR NOTAS
 export const guardarNotas = async (req, res) => {
     const { corte, notas } = req.body;
     try {
@@ -131,7 +131,7 @@ export const guardarNotas = async (req, res) => {
     }
 };
 
-// --- 4. RENDER ASISTENCIA (NUEVO) ---
+// RENDER ASISTENCIA (NUEVO)
 export const renderAsistencia = async (req, res) => {
     const { idCurso } = req.params;
 
@@ -150,7 +150,7 @@ export const renderAsistencia = async (req, res) => {
                 WHERE C.ID_Curso = @ID_Curso
             `);
 
-        // 2. Lista de Estudiantes (Solo Activos)
+        // Lista de Estudiantes (Solo Activos)
         const estudiantesResult = await pool.request()
             .input('ID_Curso', sql.Int, idCurso)
             .query(`
@@ -177,7 +177,7 @@ export const renderAsistencia = async (req, res) => {
     }
 };
 
-// --- 5. GUARDAR ASISTENCIA (NUEVO) ---
+// GUARDAR ASISTENCIA (NUEVO)
 export const guardarAsistencia = async (req, res) => {
     const { fecha, asistencias } = req.body;
 

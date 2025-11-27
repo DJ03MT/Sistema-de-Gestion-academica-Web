@@ -10,9 +10,8 @@ import {
     renderManageAnios,
     crearAnioLectivo,
     activarAnioLectivo,
-    renderManageCriterios, // <-- AÑADIR
-    bulkCrearCriterios,    // <-- AÑADIR
-    // Nuevas funciones para Valores Globales
+    renderManageCriterios,
+    bulkCrearCriterios,
     renderManageGlobales,
     updateValorDelMes,
     updateCalendarioLink
@@ -22,8 +21,6 @@ const router = Router();
 
 // Todas las rutas en este archivo están protegidas por el middleware isDirector
 router.use(isDirector);
-
-// --- RUTAS DEL PANEL DE ADMIN ---
 
 // Dashboard principal
 router.get('/admin', renderAdminDashboard);
@@ -35,14 +32,13 @@ router.post('/admin/usuarios/:id', updateUsuario);
 // Gestión de Cursos (Profesor + Clase)
 router.get('/admin/cursos', renderManageCursos);
 router.post('/admin/cursos', crearCurso);
-router.post('/admin/cursos/:id/delete', eliminarCurso); // Usamos POST para un form simple
+router.post('/admin/cursos/:id/delete', eliminarCurso);
 
 // Gestión de Años Lectivos
 router.get('/admin/anios', renderManageAnios);
 router.post('/admin/anios', crearAnioLectivo);
 router.post('/admin/anios/:id/activar', activarAnioLectivo);
 
-// --- AÑADIR ESTAS RUTAS NUEVAS ---
 // Gestión de Criterios de Evaluación
 router.get('/admin/criterios', renderManageCriterios);
 router.post('/admin/criterios/bulk-create', bulkCrearCriterios);

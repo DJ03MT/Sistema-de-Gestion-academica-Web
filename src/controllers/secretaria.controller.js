@@ -1,14 +1,10 @@
 import { getPool, sql } from '../config/database.js';
 
-// ---------------------------------------------
-// RENDER ADD (¡ESTA ES LA FUNCIÓN QUE FALTABA!)
-// ---------------------------------------------
+// RENDER ADD
 export const renderAgregarProfesorForm = (req, res) => {
     try {
-        // Esta vista es simple, solo renderiza el EJS
-        // El EJS existe en: src/views/secretaria/AdminProfesores/agregar-profesor.ejs
-        res.render('secretaria/AdminProfesores/agregar-profesor', { 
-            user: req.user 
+        res.render('secretaria/AdminProfesores/agregar-profesor', {
+            user: req.user
         });
     } catch (err) {
         console.error("Error al renderizar 'agregar-profesor':", err);
@@ -16,15 +12,12 @@ export const renderAgregarProfesorForm = (req, res) => {
     }
 };
 
-// ---------------------------------------------
-// CREATE (Para 'agregar-profesor.ejs')
-// ---------------------------------------------
+// CREATE
 export const crearProfesor = async (req, res) => {
-    const { 
+    const {
         PRIMER_NOMBRE, SEGUNDO_NOMBRE, PRIMER_APELLIDO, SEGUNDO_APELLIDO,
         CEDULA_IDENTIDAD, CARGO_REAL, ESPECIALIDAD_DOCENTE,
         CARGA_HORARIA, TITULOS, TURNO, OBSERVACIONES
-        // --- 1. ELIMINA FECHA_CREACION DE AQUÍ ---
     } = req.body;
 
     try {
@@ -41,7 +34,6 @@ export const crearProfesor = async (req, res) => {
             .input('TITULOS', sql.VarChar, TITULOS)
             .input('TURNO', sql.VarChar, TURNO)
             .input('OBSERVACIONES', sql.VarChar, OBSERVACIONES)
-            // --- 2. ELIMINA EL INPUT DE FECHA_CREACION DE AQUÍ ---
             .query(`
                 INSERT INTO Profesores (
                     PRIMER_NOMBRE, SEGUNDO_NOMBRE, PRIMER_APELLIDO, SEGUNDO_APELLIDO,
@@ -55,8 +47,8 @@ export const crearProfesor = async (req, res) => {
                     /* --- 4. ELIMINA EL VALOR DE FECHA DE AQUÍ --- */
                 )
             `);
-        
-        res.redirect('/secretaria'); 
+
+        res.redirect('/secretaria');
 
     } catch (err) {
         console.error('Error al crear profesor:', err);
@@ -64,9 +56,7 @@ export const crearProfesor = async (req, res) => {
     }
 };
 
-// ---------------------------------------------
-// RENDER EDIT (Para 'editar-profesor.ejs')
-// ---------------------------------------------
+// RENDER EDIT
 export const renderEditarProfesorForm = async (req, res) => {
     try {
         const { id } = req.params;
@@ -76,11 +66,10 @@ export const renderEditarProfesorForm = async (req, res) => {
             pool.request()
                 .input('ID_PROFESOR', sql.Int, id)
                 .query('SELECT * FROM Profesores WHERE ID_PROFESOR = @ID_PROFESOR'),
-            
-            // --- INICIO DE LA MODIFICACIÓN ---
+
             // Esta nueva consulta filtra por rol e incluye al usuario ya asignado
             pool.request()
-                .input('ID_PROFESOR_current', sql.Int, id) 
+                .input('ID_PROFESOR_current', sql.Int, id)
                 .query(`
                     SELECT U.ID_Usuario, U.Email, R.NombreRol
                     FROM Usuarios U
@@ -96,7 +85,6 @@ export const renderEditarProfesorForm = async (req, res) => {
                     
                     ORDER BY U.Email
                 `)
-            // --- FIN DE LA MODIFICACIÓN ---
         ]);
         if (profesorResult.recordset.length === 0) {
             return res.status(404).send('Profesor no encontrado');
@@ -113,16 +101,15 @@ export const renderEditarProfesorForm = async (req, res) => {
         res.redirect('/secretaria');
     }
 };
-// ---------------------------------------------
-// UPDATE (Para 'editar-profesor.ejs') - ACTUALIZADO
-// ---------------------------------------------
+
+// UPDATE
 export const actualizarProfesor = async (req, res) => {
     const { id } = req.params;
-    const { 
+    const {
         PRIMER_NOMBRE, SEGUNDO_NOMBRE, PRIMER_APELLIDO, SEGUNDO_APELLIDO,
         CEDULA_IDENTIDAD, CARGO_REAL, ESPECIALIDAD_DOCENTE,
         CARGA_HORARIA, TITULOS, TURNO, OBSERVACIONES,
-        ID_Usuario 
+        ID_Usuario
     } = req.body;
 
     // Asegura que un string vacío se guarde como NULL
@@ -156,8 +143,8 @@ export const actualizarProfesor = async (req, res) => {
                     FechaActualizacion = GETDATE() -- <-- CAMBIO: Auditoría
                 WHERE ID_PROFESOR = @ID_PROFESOR
             `);
-        
-        res.redirect('/secretaria?success=Profesor actualizado con éxito'); 
+
+        res.redirect('/secretaria?success=Profesor actualizado con éxito');
 
     } catch (err) {
         console.error('Error al actualizar profesor:', err);
@@ -165,34 +152,28 @@ export const actualizarProfesor = async (req, res) => {
     }
 };
 
-// ---------------------------------------------
-// LOGICA DE DESACTIVAR (El botón "Desactivar") - ACTUALIZADO
-// ---------------------------------------------
+// LOGICA DE DESACTIVAR
 export const desactivarProfesor = async (req, res) => {
-    // Esta función ahora usa el ID_PROFESOR, no el ID_Usuario
-    const { id } = req.params; // Este es ID_PROFESOR
+    const { id } = req.params;
     let transaction;
-    
+
     try {
         const pool = await getPool();
         transaction = pool.transaction();
         await transaction.begin();
 
-        // 1. Obtener el ID_Usuario (si existe)
         const idUsuarioResult = await transaction.request()
             .input('ID_PROFESOR', sql.Int, id)
             .query('SELECT ID_Usuario FROM Profesores WHERE ID_PROFESOR = @ID_PROFESOR');
 
         const idUsuario = idUsuarioResult.recordset.length > 0 ? idUsuarioResult.recordset[0].ID_Usuario : null;
 
-        // 2. Desactivar el login (si existe)
         if (idUsuario) {
             await transaction.request()
                 .input('ID_Usuario', sql.Int, idUsuario)
                 .query('UPDATE Usuarios SET EstaActivo = 0, FechaActualizacion = GETDATE() WHERE ID_Usuario = @ID_Usuario');
         }
 
-        // 3. Desactivar el registro del Profesor (CRÍTICO)
         await transaction.request()
             .input('ID_PROFESOR', sql.Int, id)
             .query(`
@@ -203,7 +184,7 @@ export const desactivarProfesor = async (req, res) => {
                     FechaActualizacion = GETDATE()
                 WHERE ID_PROFESOR = @ID_PROFESOR
             `);
-        
+
         await transaction.commit();
         res.json({ success: true, message: 'Profesor desactivado. Ya no aparecerá en las listas ni podrá iniciar sesión.' });
 
@@ -214,9 +195,7 @@ export const desactivarProfesor = async (req, res) => {
     }
 };
 
-// ---------------------------------------------
-// RENDER INACTIVOS (La página 'inactivos.ejs') - ACTUALIZADO
-// ---------------------------------------------
+// RENDER INACTIVOS
 export const renderInactivos = async (req, res) => {
     try {
         const pool = await getPool();
@@ -226,7 +205,7 @@ export const renderInactivos = async (req, res) => {
                 WHERE EstaActivo = 0
                 ORDER BY PRIMER_APELLIDO
             `);
-        
+
         res.render('secretaria/AdminProfesores/inactivos', {
             user: req.user,
             profesores: result.recordset
@@ -237,33 +216,28 @@ export const renderInactivos = async (req, res) => {
     }
 };
 
-// ---------------------------------------------
-// LOGICA DE REACTIVAR (El botón en 'inactivos.ejs') - ACTUALIZADO
-// ---------------------------------------------
+// LOGICA DE REACTIVAR
 export const reactivarProfesor = async (req, res) => {
-    const { id } = req.params; // Este es el ID_PROFESOR
+    const { id } = req.params;
     let transaction;
-    
+
     try {
         const pool = await getPool();
         transaction = pool.transaction();
         await transaction.begin();
 
-        // 1. Obtener el ID_Usuario (si existe)
         const idUsuarioResult = await transaction.request()
             .input('ID_PROFESOR', sql.Int, id)
             .query('SELECT ID_Usuario FROM Profesores WHERE ID_PROFESOR = @ID_PROFESOR');
-        
+
         const idUsuario = idUsuarioResult.recordset.length > 0 ? idUsuarioResult.recordset[0].ID_Usuario : null;
 
-        // 2. Reactivar el login (si existe)
         if (idUsuario) {
             await transaction.request()
                 .input('ID_Usuario', sql.Int, idUsuario)
                 .query('UPDATE Usuarios SET EstaActivo = 1, FechaActualizacion = GETDATE() WHERE ID_Usuario = @ID_Usuario');
         }
 
-        // 3. Reactivar el registro del Profesor
         await transaction.request()
             .input('ID_PROFESOR', sql.Int, id)
             .query(`
@@ -274,25 +248,23 @@ export const reactivarProfesor = async (req, res) => {
                     FechaActualizacion = GETDATE()
                 WHERE ID_PROFESOR = @ID_PROFESOR
             `);
-        
+
         await transaction.commit();
-        res.redirect('/secretaria'); 
+        res.redirect('/secretaria');
 
     } catch (err) {
         if (transaction) await transaction.rollback();
         console.error('Error al reactivar profesor:', err);
-        res.redirect('/secretaria/profesores/inactivos'); 
+        res.redirect('/secretaria/profesores/inactivos');
     }
 };
-// ---------------------------------------------
-// RENDER: Historial Académico del Estudiante
-// ---------------------------------------------
+
+// Historial Académico del Estudiante
 export const renderHistorialEstudiante = async (req, res) => {
     const { id } = req.params;
     try {
         const pool = await getPool();
 
-        // 1. Obtener la información principal del estudiante
         const estudianteResult = await pool.request()
             .input('id_estudiante', sql.Int, id)
             .query(`
@@ -306,7 +278,6 @@ export const renderHistorialEstudiante = async (req, res) => {
         }
         const estudiante = estudianteResult.recordset[0];
 
-        // 2. Obtener TODAS sus inscripciones de TODOS los años
         const inscripcionesResult = await pool.request()
             .input('id_estudiante', sql.Int, id)
             .query(`
@@ -328,7 +299,6 @@ export const renderHistorialEstudiante = async (req, res) => {
                 ORDER BY AL.Anio DESC, A.NombreAsignatura ASC
             `);
 
-        // 3. Agrupar las inscripciones por año
         const historial = {};
         inscripcionesResult.recordset.forEach(insc => {
             const anio = insc.Anio;
@@ -342,7 +312,6 @@ export const renderHistorialEstudiante = async (req, res) => {
             historial[anio].boletin.push(insc);
         });
 
-        // Convertir el objeto en un array ordenado
         const historialPorAnio = Object.values(historial).sort((a, b) => b.Anio - a.Anio);
 
         res.render('secretaria/AdminEstudiantes/historial-estudiante', {

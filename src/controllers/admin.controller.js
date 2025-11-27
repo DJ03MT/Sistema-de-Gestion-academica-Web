@@ -1,15 +1,15 @@
 import { getPool, sql } from '../config/database.js';
 
-// --- VISTAS DEL DASHBOARD ---
+// Vistas
 
-// 1. RENDER: El menú principal del Admin
+// El menú principal del Admin
 export const renderAdminDashboard = (req, res) => {
     res.render('admin/dashboard', { user: req.user });
 };
 
-// --- GESTIÓN DE USUARIOS Y ROLES ---
+// GESTIÓN DE USUARIOS Y ROLES
 
-// 2. RENDER: Página para gestionar Usuarios y Roles
+//Página para gestionar Usuarios y Roles
 export const renderManageUsuarios = async (req, res) => {
     try {
         const pool = await getPool();
@@ -35,7 +35,7 @@ export const renderManageUsuarios = async (req, res) => {
     }
 };
 
-// 3. UPDATE: Actualizar el rol o estado de un usuario
+// Actualizar el rol o estado de un usuario
 export const updateUsuario = async (req, res) => {
     const { id } = req.params;
     const { ID_Rol, EstaActivo } = req.body;
@@ -47,7 +47,7 @@ export const updateUsuario = async (req, res) => {
             .input('ID_Rol', sql.Int, ID_Rol)
             .input('EstaActivo', sql.Bit, EstaActivo)
             .query('UPDATE Usuarios SET ID_Rol = @ID_Rol, EstaActivo = @EstaActivo WHERE ID_Usuario = @ID_Usuario');
-        
+
         res.redirect('/admin/usuarios');
     } catch (err) {
         console.error(err);
@@ -56,8 +56,7 @@ export const updateUsuario = async (req, res) => {
 };
 
 
-// --- GESTIÓN DE CURSOS (Asignar Profesor a Clase) ---
-// 4. RENDER: Página para gestionar Cursos (MODIFICADO)
+//Página para gestionar Cursos 
 export const renderManageCursos = async (req, res) => {
     // Leemos los mensajes de éxito o error de la URL
     const { error, success } = req.query;
@@ -82,10 +81,10 @@ export const renderManageCursos = async (req, res) => {
 
     try {
         const pool = await getPool();
-        
+
         const anioActivoResult = await pool.request()
             .query('SELECT TOP 1 ID_Anio_Lectivo, Anio FROM Anios_Lectivos WHERE EstaActivo = 1');
-        
+
         if (anioActivoResult.recordset.length === 0) {
             // Este es un error crítico, lo manejamos primero
             return res.status(500).send('Error Crítico: No hay ningún año lectivo activo. Configure uno primero en el panel de "Año Lectivo".');
@@ -127,7 +126,7 @@ export const renderManageCursos = async (req, res) => {
     }
 };
 
-// 5. CREATE: Crear un nuevo curso (MODIFICADO)
+// Crear un nuevo curso 
 export const crearCurso = async (req, res) => {
     const { ID_Profesor, ID_Asignatura, ID_Grado, ID_Seccion, ID_Anio_Lectivo } = req.body;
     try {
@@ -156,7 +155,7 @@ export const crearCurso = async (req, res) => {
     }
 };
 
-// 6. DELETE: Eliminar una asignación de curso (MODIFICADO)
+//Eliminar una asignación de curso 
 export const eliminarCurso = async (req, res) => {
     const { id } = req.params;
     try {
@@ -179,9 +178,9 @@ export const eliminarCurso = async (req, res) => {
 };
 
 
-// --- GESTIÓN DE AÑOS LECTIVOS ---
+// GESTIÓN DE AÑOS LECTIVOS
 
-// 7. RENDER: Página para gestionar Años Lectivos
+//Página para gestionar Años Lectivos
 export const renderManageAnios = async (req, res) => {
     try {
         const pool = await getPool();
@@ -196,7 +195,7 @@ export const renderManageAnios = async (req, res) => {
     }
 };
 
-// 8. CREATE: Crear un nuevo Año Lectivo
+// Crear un nuevo Año Lectivo
 export const crearAnioLectivo = async (req, res) => {
     const { Anio, FechaInicio, FechaFin } = req.body;
     try {
@@ -213,7 +212,7 @@ export const crearAnioLectivo = async (req, res) => {
     }
 };
 
-// 9. UPDATE: Activar un Año (Cerrar el anterior)
+// Activar un Año (Cerrar el anterior)
 export const activarAnioLectivo = async (req, res) => {
     const { id } = req.params;
     const pool = await getPool();
@@ -226,7 +225,7 @@ export const activarAnioLectivo = async (req, res) => {
         await transaction.request()
             .input('ID_Anio_Lectivo', sql.Int, id)
             .query('UPDATE Anios_Lectivos SET EstaActivo = 1 WHERE ID_Anio_Lectivo = @ID_Anio_Lectivo');
-        
+
         await transaction.commit();
         res.redirect('/admin/anios');
     } catch (err) {
@@ -236,9 +235,7 @@ export const activarAnioLectivo = async (req, res) => {
     }
 };
 
-// =================================================================
-// RENDER: Página para gestionar Valores Globales
-// =================================================================
+//Página para gestionar Valores Globales
 export const renderManageGlobales = async (req, res) => {
     try {
         const pool = await getPool();
@@ -263,9 +260,7 @@ export const renderManageGlobales = async (req, res) => {
     }
 };
 
-// =================================================================
-// UPDATE: Actualizar un Valor del Mes
-// =================================================================
+//Actualizar un Valor del Mes
 export const updateValorDelMes = async (req, res) => {
     const { id } = req.params;
     const { NombreValor } = req.body;
@@ -283,9 +278,7 @@ export const updateValorDelMes = async (req, res) => {
     }
 };
 
-// =================================================================
-// UPDATE: Actualizar el Link del Calendario
-// =================================================================
+//Actualizar el Link del Calendario
 export const updateCalendarioLink = async (req, res) => {
     const { calendario_link } = req.body;
     try {
@@ -301,13 +294,11 @@ export const updateCalendarioLink = async (req, res) => {
     }
 };
 
-// =================================================================
-// RENDER: Página para gestionar Criterios
-// =================================================================
+//  Página para gestionar Criterios
 export const renderManageCriterios = async (req, res) => {
     try {
         const pool = await getPool();
-        
+
         // Obtenemos el año activo actual
         const anioActivoID = (await pool.request().query('SELECT ID_Anio_Lectivo FROM Anios_Lectivos WHERE EstaActivo = 1')).recordset[0].ID_Anio_Lectivo;
 
@@ -342,12 +333,10 @@ export const renderManageCriterios = async (req, res) => {
     }
 };
 
-// =================================================================
-// CREATE: Crear en lote los 20 criterios para 4 cortes
-// =================================================================
+//Crear en lote los 20 criterios para 4 cortes
 export const bulkCrearCriterios = async (req, res) => {
     const { ID_Curso } = req.body;
-    
+
     // Nombres de los criterios (4 cortes * 5 sub-criterios = 20)
     const criteriosBase = [];
     for (let i = 1; i <= 4; i++) {
@@ -370,7 +359,7 @@ export const bulkCrearCriterios = async (req, res) => {
                     VALUES (@ID_Curso, @NombreCriterio, @Valor_Maximo)
                 `);
         }
-        
+
         await transaction.commit();
         res.redirect('/admin/criterios');
     } catch (err) {
@@ -379,5 +368,5 @@ export const bulkCrearCriterios = async (req, res) => {
         res.redirect('/admin/criterios?error=' + encodeURIComponent(err.message));
     }
 };
-// --- GESTIÓN DE ACOMPAÑANTES (¡Falta!) ---
+// GESTIÓN DE ACOMPAÑANTES
 // (Esta la podemos añadir después, es igual a la de Cursos pero con la tabla Acompanante_Asignacion)

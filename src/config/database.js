@@ -1,6 +1,6 @@
 import sql from 'mssql';
 
-// 1. Tu configuración de Azure (está perfecta)
+//Connexion a BD
 const dbConfig = {
     server: process.env.AZURE_SQL_SERVER,
     port: 1433,
@@ -19,23 +19,19 @@ const dbConfig = {
     }
 };
 
-// 2. Variable para guardar el pool
+
 let pool = null;
 
-/**
- * Función para obtener el pool de conexiones.
- * Si el pool no existe, lo crea. Si ya existe, lo retorna.
- */
 export async function getPool() {
     if (pool) {
-        return pool; // Retorna el pool existente
+        return pool;
     }
 
     try {
-        // 3. Conecta y guarda el pool
+
         pool = await sql.connect(dbConfig);
 
-        // Opcional: Verificar la conexión
+        // Verifica la conexión
         await pool.request().query('SELECT 1 as connected');
 
         console.log('✅ Connected to Azure SQL successfully!');
@@ -43,10 +39,10 @@ export async function getPool() {
 
     } catch (err) {
         console.error('❌ Error creating connection pool:', err.message);
-        pool = null; // Resetea el pool si falla
+        pool = null;
         throw err;
     }
 }
 
-// 4. (Opcional) Exportar sql para no importarlo en todos lados
+
 export { sql };

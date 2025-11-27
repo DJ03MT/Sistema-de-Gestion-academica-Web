@@ -1,8 +1,6 @@
 // Redirección después del login exitoso
 export const googleCallback = (req, res) => {
-    // --- CORRECCIÓN ---
     const rol = req.user.rol ? req.user.rol.trim().toUpperCase() : '';
-    // --- FIN CORRECCIÓN ---
     console.log(`Redirigiendo usuario con rol: ${rol}`);
 
     switch (rol) {
@@ -13,7 +11,7 @@ export const googleCallback = (req, res) => {
             res.redirect('/admin');
             break;
         case 'PROFESORES':
-            res.redirect('/profesores'); // <-- CÓDIGO CORRECTO
+            res.redirect('/profesores');
             break;
         case 'ESTUDIANTES':
             res.redirect('/estudiantes');

@@ -1,6 +1,6 @@
 import { getPool, sql } from '../config/database.js';
 
-// --- FUNCIÓN HELPER (NUEVA) ---
+//  FUNCIÓN HELPER 
 async function getGlobalValues(pool) {
     const currentMonth = new Date().getMonth() + 1;
     const [valorResult, calendarioResult] = await Promise.all([
@@ -19,11 +19,11 @@ async function getGlobalValues(pool) {
         : '#';
     return { valorDelMes, calendarioLink };
 }
-// --- FIN FUNCIÓN HELPER ---
+
 
 // Renderiza la página de Login
 export const renderLogin = (req, res) => {
-    // MODIFICACIÓN: Solo redirigir si está autenticado Y NO hay un error en la URL
+    // Solo redirigir si está autenticado Y NO hay un error en la URL
     if (req.isAuthenticated() && !req.query.error) {
         const rol = req.user.rol;
         switch (rol) {
@@ -47,17 +47,13 @@ export const renderLogin = (req, res) => {
     res.render('login', { error: errorMessage, user: req.user || null });
 };
 
-// =================================================================
-// RENDER SECRETARIA (ACTUALIZADO CON JOINS A FICHA)
-// =================================================================
+// RENDER SECRETARIA
 export const renderMenuSecretaria = async (req, res) => {
     try {
         const successMessage = req.query.success || null;
         const errorMessage = req.query.error || null;
 
         const pool = await getPool();
-
-        // --- INICIO DE LA MODIFICACIÓN ---
 
         // Consultamos Estudiantes y unimos con su Ficha Activa
         const studentsQuery = `
@@ -91,21 +87,17 @@ export const renderMenuSecretaria = async (req, res) => {
 
         const currentMonth = new Date().getMonth() + 1;
 
-        // Añadimos la consulta de Grados
         const [studentsResult, profesResult, gradosResult, globalValues] = await Promise.all([
             pool.request().query(studentsQuery),
             pool.request().query(profesQuery),
-            pool.request().query('SELECT ID_Grado, NombreGrado FROM Grados ORDER BY ID_Grado'), // <-- NUEVA CONSULTA
+            pool.request().query('SELECT ID_Grado, NombreGrado FROM Grados ORDER BY ID_Grado'),
             getGlobalValues(pool)
         ]);
 
-        // --- FIN DE LA MODIFICACIÓN ---
-
         const estudiantes = studentsResult.recordset;
         const profesores = profesResult.recordset;
-        const grados = gradosResult.recordset; // <-- NUEVA VARIABLE
+        const grados = gradosResult.recordset;
 
-        // Obtenemos los valores del helper
         const { valorDelMes, calendarioLink } = globalValues;
         const stats = {
             totalEstudiantes: estudiantes.filter(e => e.NombreEstado === 'Activo').length,
@@ -130,15 +122,12 @@ export const renderMenuSecretaria = async (req, res) => {
     }
 };
 
-// =================================================================
-// RENDER ESTUDIANTE (ACTUALIZADO CON LÓGICA DE MATRÍCULA)
-// =================================================================
+// RENDER ESTUDIANTE
 export const renderMenuEstudiante = async (req, res) => {
     try {
         const pool = await getPool();
         const ID_Usuario = req.user.id;
 
-        // 1. Obtener el ID del Estudiante y su estado actual
         const estudianteResult = await pool.request()
             .input('ID_Usuario', sql.Int, ID_Usuario)
             .query(`
@@ -155,15 +144,12 @@ export const renderMenuEstudiante = async (req, res) => {
         }
         const estudiante = estudianteResult.recordset[0];
 
-        // 2. Obtener el año lectivo ACTIVO y el SIGUIENTE
         const aniosResult = await pool.request().query(`
             SELECT ID_Anio_Lectivo, Anio, EstaActivo FROM Anios_Lectivos ORDER BY Anio DESC
         `);
         const anioActivo = aniosResult.recordset.find(a => a.EstaActivo);
-        // El año siguiente es el más reciente que NO está activo Y es mayor que el activo
         const anioSiguiente = aniosResult.recordset.find(a => !a.EstaActivo && a.Anio > (anioActivo ? anioActivo.Anio : 0));
 
-        // Objeto base para la info de matrícula
         const infoMatricula = {
             anioActivo: anioActivo ? anioActivo.Anio : 'N/A',
             anioSiguiente: anioSiguiente ? anioSiguiente.Anio : 'N/A',
@@ -182,7 +168,6 @@ export const renderMenuEstudiante = async (req, res) => {
             return res.render('estudiantes/menu-estudiantes', { user: req.user, estudiante: estudiante, infoMatricula: infoMatricula });
         }
 
-        // 3. Verificar si el estudiante YA se pre-matriculó para el siguiente año
         const matriculaResult = await pool.request()
             .input('ID_Estudiante', sql.Int, estudiante.id_estudiante)
             .input('ID_Anio_Lectivo_Destino', sql.Int, anioSiguiente.ID_Anio_Lectivo)
@@ -193,7 +178,6 @@ export const renderMenuEstudiante = async (req, res) => {
             infoMatricula.estadoMatricula = matriculaResult.recordset[0].EstadoFicha;
         }
 
-        // 4. Obtener el grado actual y el grado destino
         const gradoActualResult = await pool.request()
             .input('ID_Estudiante', sql.Int, estudiante.id_estudiante)
             .input('ID_Anio_Lectivo', sql.Int, anioActivo.ID_Anio_Lectivo)
@@ -228,7 +212,6 @@ export const renderMenuEstudiante = async (req, res) => {
             infoMatricula.error = 'No estás inscrito en ningún curso este año. Contacta a secretaría.';
         }
 
-        // Obtener valores globales y pasarlos a la vista
         const { valorDelMes, calendarioLink } = await getGlobalValues(pool);
 
         res.render('estudiantes/menu-estudiantes', {
@@ -246,6 +229,5 @@ export const renderMenuEstudiante = async (req, res) => {
 };
 // Renderiza la página de Ayuda
 export const renderAyuda = (req, res) => {
-    // Renderiza la nueva vista. No necesita datos de usuario.
     res.render('public/ayuda');
 };
